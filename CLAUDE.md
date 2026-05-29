@@ -8,7 +8,10 @@ Assets/ - 应用视觉资产 (1子目录: AppIcon)
 docs/ - 产品规格与参考素材 (1子目录: reference)
 </directory>
 <directory>
-Sources/ - Swift 生产代码入口 (2子目录: DeskMagnetCore, DeskMagnetCLI)
+Scripts/ - 构建脚本 (1文件: build-app.sh)
+</directory>
+<directory>
+Sources/ - Swift 生产代码入口 (3子目录: DeskMagnetApp, DeskMagnetCore, DeskMagnetCLI)
 </directory>
 <directory>
 Tests/ - Swift Testing 测试代码 (1子目录: DeskMagnetCoreTests)
@@ -28,5 +31,6 @@ P0 先做命令行验证器，不做 UI；Finder 真实副作用被 ShellRunning
 变更日志:
 2026-05-30: 播种 SwiftPM P0 验证器，建立 DeskMagnetCore/DeskMagnetCLI/Tests 分形文档，并忽略本地构建产物。
 2026-05-30: 接入清扫 glyph 作为 DeskMagnet canonical app icon，保存 SVG 源与 macOS `.icns` 产物。
+2026-05-30: 增加 P1 macOS App 外壳、状态恢复编排、窗口拖动跟随与 `.app` 构建脚本；DeskMagnetCore 拆分 Automation/Coordination/State，根目录不堆文件。
 
 法则: 极简·稳定·导航·版本精确

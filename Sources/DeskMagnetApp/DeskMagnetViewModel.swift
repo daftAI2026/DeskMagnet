@@ -1,0 +1,128 @@
+/**
+ * [INPUT]: 依赖 SwiftUI Observation、AppKit NSAlert 和 DeskMagnetCore.AppCoordinator。
+ * [OUTPUT]: 提供 DeskMagnetViewModel，暴露窗口状态、按钮动作、拖动同步动作。
+ * [POS]: DeskMagnetApp 的状态模型，隔离 UI 文案与核心 Finder 编排。
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
+
+import AppKit
+import DeskMagnetCore
+import Foundation
+
+@MainActor
+final class DeskMagnetViewModel: ObservableObject {
+    enum Phase: Equatable {
+        case idle
+        case working(String, Double)
+        case attached(Int)
+        case restoring
+        case failed(String)
+    }
+
+    @Published private(set) var phase: Phase = .idle
+    var windowFrameProvider: (() -> WindowFrame?)?
+
+    private let coordinator: AppCoordinator
+
+    init(coordinator: AppCoordinator) {
+        self.coordinator = coordinator
+    }
+
+    var isAttached: Bool {
+        if case .attached = phase { return true }
+        return (try? coordinator.unfinishedState()) != nil
+    }
+
+    var hasUnfinishedState: Bool {
+        (try? coordinator.unfinishedState()) != nil
+    }
+
+    var primaryButtonTitle: String {
+        switch phase {
+        case .idle, .failed:
+            "吸附桌面"
+        case .attached:
+            "恢复桌面"
+        case .working, .restoring:
+            "处理中..."
+        }
+    }
+
+    var footnote: String {
+        switch phase {
+        case .idle:
+            "不删除、移动或重命名任何文件"
+        case .working:
+            "正在临时优化 Finder 桌面布局"
+        case .attached:
+            "拖动窗口试试看"
+        case .restoring:
+            "正在恢复 Finder 桌面设置"
+        case .failed:
+            "需要允许 DeskMagnet 控制 Finder"
+        }
+    }
+
+    func primaryAction() {
+        switch phase {
+        case .attached:
+            Task { await restore() }
+        case .working, .restoring:
+            return
+        case .idle, .failed:
+            guard confirmAttach() else { return }
+            Task { await attach() }
+        }
+    }
+
+    func attach() async {
+        guard let frame = windowFrameProvider?() else {
+            phase = .failed("无法读取主窗口位置。")
+            return
+        }
+        phase = .working("正在清理桌面...", 0.25)
+        do {
+            let state = try await coordinator.attach(windowFrame: frame)
+            phase = .attached(state.items.count)
+        } catch {
+            phase = .failed(userMessage(for: error))
+        }
+    }
+
+    func restore() async {
+        phase = .restoring
+        do {
+            _ = try await coordinator.restore()
+            phase = .idle
+        } catch {
+            phase = .failed(userMessage(for: error))
+        }
+    }
+
+    func sync(windowFrame: WindowFrame, final: Bool) async {
+        guard isAttached else { return }
+        do {
+            try await coordinator.syncAttachedIcons(windowFrame: windowFrame)
+        } catch where !final {
+            return
+        } catch {
+            phase = .failed(userMessage(for: error))
+        }
+    }
+
+    private func confirmAttach() -> Bool {
+        let alert = NSAlert()
+        alert.messageText = "为了真实移动桌面图标，DeskMagnet 需要临时关闭 Finder 的桌面分组/自动排序。"
+        alert.informativeText = "应用会保存当前 Finder 桌面设置，并在恢复或退出时还原。不会删除、移动或重命名任何文件。"
+        alert.addButton(withTitle: "继续")
+        alert.addButton(withTitle: "取消")
+        return alert.runModal() == .alertFirstButtonReturn
+    }
+
+    private func userMessage(for error: Error) -> String {
+        if String(describing: error).contains("-1743") {
+            return "需要允许 DeskMagnet 控制 Finder。请前往：系统设置 -> 隐私与安全性 -> 自动化。"
+        }
+        return String(describing: error)
+    }
+}

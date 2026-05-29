@@ -9,12 +9,26 @@ let package = Package(
     ],
     products: [
         .library(name: "DeskMagnetCore", targets: ["DeskMagnetCore"]),
-        .executable(name: "deskmagnet", targets: ["DeskMagnetCLI"])
+        .executable(name: "deskmagnet", targets: ["DeskMagnetCLI"]),
+        .executable(name: "DeskMagnetApp", targets: ["DeskMagnetApp"])
     ],
     targets: [
-        .target(name: "DeskMagnetCore", exclude: ["CLAUDE.md"]),
+        .target(
+            name: "DeskMagnetCore",
+            exclude: [
+                "CLAUDE.md",
+                "Automation/CLAUDE.md",
+                "Coordination/CLAUDE.md",
+                "State/CLAUDE.md"
+            ]
+        ),
         .executableTarget(
             name: "DeskMagnetCLI",
+            dependencies: ["DeskMagnetCore"],
+            exclude: ["CLAUDE.md"]
+        ),
+        .executableTarget(
+            name: "DeskMagnetApp",
             dependencies: ["DeskMagnetCore"],
             exclude: ["CLAUDE.md"]
         ),

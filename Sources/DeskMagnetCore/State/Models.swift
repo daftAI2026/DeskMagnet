@@ -21,6 +21,30 @@ public struct Point: Codable, Equatable, Sendable {
     }
 }
 
+public struct Offset: Codable, Equatable, Sendable {
+    public let dx: Int
+    public let dy: Int
+
+    public init(dx: Int, dy: Int) {
+        self.dx = dx
+        self.dy = dy
+    }
+}
+
+public struct WindowFrame: Codable, Equatable, Sendable {
+    public let x: Int
+    public let y: Int
+    public let width: Int
+    public let height: Int
+
+    public init(x: Int, y: Int, width: Int, height: Int) {
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+    }
+}
+
 public struct DesktopItem: Codable, Equatable, Sendable {
     public let name: String
     public let path: String
@@ -47,6 +71,64 @@ public struct P0Snapshot: Codable, Equatable, Sendable {
     public let item: DesktopItem
     public let movedPosition: Point
     public let createdAt: Date
+}
+
+public enum RecoveryStatus: String, Codable, Equatable, Sendable {
+    case attached
+}
+
+public struct RecoveryItem: Codable, Equatable, Sendable {
+    public let name: String
+    public let path: String
+    public let originalPosition: Point
+    public let attachedOffset: Offset
+    public let lastKnownPosition: Point
+
+    public init(
+        name: String,
+        path: String,
+        originalPosition: Point,
+        attachedOffset: Offset,
+        lastKnownPosition: Point
+    ) {
+        self.name = name
+        self.path = path
+        self.originalPosition = originalPosition
+        self.attachedOffset = attachedOffset
+        self.lastKnownPosition = lastKnownPosition
+    }
+}
+
+public struct RecoveryState: Codable, Equatable, Sendable {
+    public let schemaVersion: Int
+    public let status: RecoveryStatus
+    public let createdAt: Date
+    public let finderSnapshotPath: String
+    public let items: [RecoveryItem]
+
+    public init(
+        schemaVersion: Int,
+        status: RecoveryStatus,
+        createdAt: Date,
+        finderSnapshotPath: String,
+        items: [RecoveryItem]
+    ) {
+        self.schemaVersion = schemaVersion
+        self.status = status
+        self.createdAt = createdAt
+        self.finderSnapshotPath = finderSnapshotPath
+        self.items = items
+    }
+}
+
+public struct RestoreResult: Equatable, Sendable {
+    public let restoredCount: Int
+    public let skippedCount: Int
+
+    public init(restoredCount: Int, skippedCount: Int) {
+        self.restoredCount = restoredCount
+        self.skippedCount = skippedCount
+    }
 }
 
 public enum DeskMagnetError: Error, Equatable, CustomStringConvertible {

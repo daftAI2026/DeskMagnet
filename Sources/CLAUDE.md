@@ -2,6 +2,7 @@
 > L2 | 父级: /Users/luo/Desktop/ClaudeCode/web/DeskMagnet/CLAUDE.md
 
 成员清单
+DeskMagnetApp/: macOS App 外壳，负责窗口、SwiftUI、关闭提示、拖动跟随
 DeskMagnetCore/: P0 领域核心，封装 Finder 设置、桌面图标与命令执行边界
 DeskMagnetCLI/: 命令行入口，暴露真实 Finder 验证流程
 

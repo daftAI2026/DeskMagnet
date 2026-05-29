@@ -12,6 +12,7 @@ import Foundation
 @MainActor
 final class WindowFollowController {
     private weak var window: NSWindow?
+    private let converter: DesktopCoordinateConverter
     private let onMove: (WindowFrame, Bool) -> Void
     private let throttleMilliseconds: () -> Int
     private var lastSync = Date.distantPast
@@ -20,10 +21,12 @@ final class WindowFollowController {
 
     init(
         window: NSWindow,
+        converter: DesktopCoordinateConverter,
         onMove: @escaping (WindowFrame, Bool) -> Void,
         throttleMilliseconds: @escaping () -> Int
     ) {
         self.window = window
+        self.converter = converter
         self.onMove = onMove
         self.throttleMilliseconds = throttleMilliseconds
         self.observer = NotificationCenter.default.addObserver(
@@ -45,7 +48,7 @@ final class WindowFollowController {
     }
 
     private func windowDidMove() {
-        guard let frame = window?.deskMagnetFollowFrame else { return }
+        guard let frame = window?.deskMagnetFollowFrame(converter: converter) else { return }
         let now = Date()
         let interval = Double(throttleMilliseconds()) / 1000
         if now.timeIntervalSince(lastSync) >= interval {
@@ -55,7 +58,7 @@ final class WindowFollowController {
         finalTimer?.invalidate()
         finalTimer = Timer.scheduledTimer(withTimeInterval: 0.35, repeats: false) { [weak self] _ in
             Task { @MainActor in
-                guard let self, let frame = self.window?.deskMagnetFollowFrame else { return }
+                guard let self, let frame = self.window?.deskMagnetFollowFrame(converter: self.converter) else { return }
                 self.onMove(frame, true)
             }
         }
@@ -63,8 +66,8 @@ final class WindowFollowController {
 }
 
 private extension NSWindow {
-    var deskMagnetFollowFrame: WindowFrame {
-        WindowFrame(
+    func deskMagnetFollowFrame(converter: DesktopCoordinateConverter) -> WindowFrame {
+        converter.windowFrameFromAppKit(
             x: Int(frame.origin.x.rounded()),
             y: Int(frame.origin.y.rounded()),
             width: Int(frame.size.width.rounded()),

@@ -19,22 +19,22 @@ struct ContentView: View {
             ProgressSection(phase: viewModel.phase)
             Button(action: viewModel.primaryAction) {
                 Text(viewModel.primaryButtonTitle)
-                    .font(.system(size: 14, weight: .semibold))
-                    .frame(minWidth: 112)
+                    .font(.system(size: 26, weight: .bold))
+                    .frame(width: 280, height: 56)
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .disabled(isBusy)
             Spacer(minLength: 14)
             Text(viewModel.footnote)
-                .font(.system(size: 11))
+                .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(.gray)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 16)
         }
-        .frame(minWidth: 360, minHeight: 220)
+        .frame(minWidth: 720, minHeight: 440)
         .background(Color(red: 0.05, green: 0.05, blue: 0.06))
     }
 
@@ -51,11 +51,11 @@ struct ContentView: View {
 private struct TitleSection: View {
     var body: some View {
         Text("桌面清理大师")
-            .font(.system(size: 20, weight: .bold))
+            .font(.system(size: 40, weight: .bold))
             .foregroundStyle(.cyan)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 22)
-            .padding(.vertical, 15)
+            .padding(.horizontal, 44)
+            .padding(.vertical, 36)
     }
 }
 
@@ -65,13 +65,13 @@ private struct StatusSection: View {
     var body: some View {
         VStack(spacing: 8) {
             Text(title)
-                .font(.system(size: 21, weight: .semibold))
+                .font(.system(size: 36, weight: .bold))
                 .foregroundStyle(color)
                 .multilineTextAlignment(.center)
                 .lineLimit(3)
                 .padding(.horizontal, 24)
             Text(subtitle)
-                .font(.system(size: 13))
+                .font(.system(size: 24, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.72))
                 .multilineTextAlignment(.center)
                 .lineLimit(3)
@@ -82,11 +82,11 @@ private struct StatusSection: View {
     private var title: String {
         switch phase {
         case .idle:
-            "桌面磁铁"
+            "一键清理桌面"
         case let .working(text, _):
             text
         case .attached:
-            "桌面已被吸住。"
+            "桌面已整理完毕！"
         case .restoring:
             "正在恢复桌面..."
         case .failed:
@@ -97,11 +97,11 @@ private struct StatusSection: View {
     private var subtitle: String {
         switch phase {
         case .idle:
-            "把真实 Finder 桌面图标吸到窗口下方。"
+            ""
         case .working:
             "正在保存 Finder 设置并读取图标坐标"
         case let .attached(count):
-            "已吸附 \(count) 个图标"
+            "已整理 \(count) 个图标"
         case .restoring:
             "图标和 Finder 设置会回到启动前"
         case let .failed(message):

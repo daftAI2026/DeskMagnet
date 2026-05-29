@@ -3,6 +3,7 @@
 
 成员清单
 AppCoordinatorTests.swift: 验证 P1 编排层的吸附、恢复、启动未恢复状态检测
+DesktopCoordinateConverterTests.swift: 验证 AppKit 左下角坐标到 Finder 左上角桌面坐标的转换
 FinderIconControllerTests.swift: 验证 AppleScript 转义、批量移动脚本和坐标多数有效规则
 LayoutEngineTests.swift: 验证窗口下方吸附布局与 offset 复用移动
 P0WorkflowTests.swift: 验证 P0 失败路径仍执行 Finder 设置恢复

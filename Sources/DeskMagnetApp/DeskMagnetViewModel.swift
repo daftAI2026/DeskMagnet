@@ -42,7 +42,7 @@ final class DeskMagnetViewModel: ObservableObject {
     var primaryButtonTitle: String {
         switch phase {
         case .idle, .failed:
-            "吸附桌面"
+            "清理桌面"
         case .attached:
             "恢复桌面"
         case .working, .restoring:
@@ -125,7 +125,7 @@ final class DeskMagnetViewModel: ObservableObject {
 
     private func confirmAttach() -> Bool {
         let alert = NSAlert()
-        alert.messageText = "为了真实移动桌面图标，DeskMagnet 需要临时关闭 Finder 的桌面分组/自动排序。"
+        alert.messageText = "桌面清理大师需要临时关闭 Finder 的桌面分组/自动排序。"
         alert.informativeText = "应用会保存当前 Finder 桌面设置，并在恢复或退出时还原。不会删除、移动或重命名任何文件。"
         alert.addButton(withTitle: "继续")
         alert.addButton(withTitle: "取消")

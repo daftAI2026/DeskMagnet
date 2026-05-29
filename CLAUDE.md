@@ -33,5 +33,6 @@ P0 先做命令行验证器，不做 UI；Finder 真实副作用被 ShellRunning
 2026-05-30: 接入清扫 glyph 作为 DeskMagnet canonical app icon，保存 SVG 源与 macOS `.icns` 产物。
 2026-05-30: 增加 P1 macOS App 外壳、状态恢复编排、窗口拖动跟随与 `.app` 构建脚本；DeskMagnetCore 拆分 Automation/Coordination/State，根目录不堆文件。
 2026-05-30: 完成 P2 体验优化，加入确定性随机堆叠、多显示器边界、图标数量分级策略、恢复详情和 UI 文案打磨。
+2026-05-30: 修正 Finder/AppKit 坐标系差异，窗口放大到双倍规格，UI 回归“桌面清理大师”清理工具伪装。
 
 法则: 极简·稳定·导航·版本精确

@@ -2,6 +2,7 @@
 > L2 | 父级: /Users/luo/Desktop/ClaudeCode/web/DeskMagnet/Sources/DeskMagnetCore/CLAUDE.md
 
 成员清单
+DesktopCoordinateConverter.swift: 坐标系转换，将 AppKit 左下角窗口/屏幕坐标转成 Finder 左上角桌面坐标
 LayoutEngine.swift: 纯布局计算，生成带确定性随机偏移的窗口下方吸附 offset，并按活动屏幕边界 clamp
 Models.swift: 领域数据模型，定义 Point、ScreenFrame、DesktopItem、IconMove、RecoveryState、IconPerformancePolicy、DeskMagnetError
 RecoveryStore.swift: 恢复状态存储，读写 Application Support 下的 state.json 与 Finder 快照路径

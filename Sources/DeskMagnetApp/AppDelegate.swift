@@ -19,24 +19,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         do {
             let store = try RecoveryStore.live()
-            let coordinator = AppCoordinator(store: store, layout: LayoutEngine(screens: NSScreen.deskMagnetScreens))
+            let converter = NSScreen.deskMagnetCoordinateConverter
+            let coordinator = AppCoordinator(store: store, layout: LayoutEngine(screens: NSScreen.deskMagnetScreens(converter: converter)))
             let model = DeskMagnetViewModel(coordinator: coordinator)
             let content = ContentView(viewModel: model)
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 260),
+                contentRect: NSRect(x: 0, y: 0, width: 800, height: 520),
                 styleMask: [.titled, .closable, .miniaturizable, .resizable],
                 backing: .buffered,
                 defer: false
             )
             window.title = "桌面清理大师"
-            window.minSize = NSSize(width: 360, height: 220)
+            window.minSize = NSSize(width: 720, height: 440)
             window.contentView = NSHostingView(rootView: content)
             window.center()
             window.delegate = self
-            model.windowFrameProvider = { [weak window] in window?.deskMagnetFrame }
+            model.windowFrameProvider = { [weak window] in window?.deskMagnetFrame(converter: converter) }
             self.window = window
             self.viewModel = model
-            self.followController = WindowFollowController(window: window) { [weak model] frame, isFinal in
+            self.followController = WindowFollowController(window: window, converter: converter) { [weak model] frame, isFinal in
                 Task { @MainActor in
                     await model?.sync(windowFrame: frame, final: isFinal)
                 }
@@ -57,7 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func windowShouldClose(_ sender: NSWindow) -> Bool {
         guard let viewModel, viewModel.isAttached, !closingAfterRestore else { return true }
         let alert = NSAlert()
-        alert.messageText = "桌面图标仍处于吸附状态。"
+        alert.messageText = "桌面整理尚未恢复。"
         alert.informativeText = "是否恢复桌面后退出？"
         alert.addButton(withTitle: "恢复并退出")
         alert.addButton(withTitle: "保持现状")
@@ -98,8 +99,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 }
 
 private extension NSWindow {
-    var deskMagnetFrame: WindowFrame {
-        WindowFrame(
+    func deskMagnetFrame(converter: DesktopCoordinateConverter) -> WindowFrame {
+        converter.windowFrameFromAppKit(
             x: Int(frame.origin.x.rounded()),
             y: Int(frame.origin.y.rounded()),
             width: Int(frame.size.width.rounded()),
@@ -109,13 +110,17 @@ private extension NSWindow {
 }
 
 private extension NSScreen {
-    static var deskMagnetScreens: [ScreenFrame] {
+    static var deskMagnetCoordinateConverter: DesktopCoordinateConverter {
+        DesktopCoordinateConverter(globalMaxY: Int(screens.map(\.frame.maxY).max()?.rounded() ?? 0))
+    }
+
+    static func deskMagnetScreens(converter: DesktopCoordinateConverter) -> [ScreenFrame] {
         screens.map {
-            ScreenFrame(
-                x: Int($0.visibleFrame.origin.x.rounded()),
-                y: Int($0.visibleFrame.origin.y.rounded()),
-                width: Int($0.visibleFrame.size.width.rounded()),
-                height: Int($0.visibleFrame.size.height.rounded())
+            converter.screenFrameFromAppKit(
+                x: Int($0.frame.origin.x.rounded()),
+                y: Int($0.frame.origin.y.rounded()),
+                width: Int($0.frame.size.width.rounded()),
+                height: Int($0.frame.size.height.rounded())
             )
         }
     }

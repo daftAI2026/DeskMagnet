@@ -17,22 +17,26 @@ struct ContentView: View {
             Spacer(minLength: 18)
             StatusSection(phase: viewModel.phase)
             ProgressSection(phase: viewModel.phase)
-            Button(action: viewModel.primaryAction) {
-                Text(viewModel.primaryButtonTitle)
-                    .font(.system(size: 26, weight: .bold))
-                    .frame(width: 280, height: 56)
+            if viewModel.showsPrimaryButton {
+                Button(action: viewModel.primaryAction) {
+                    Text(viewModel.primaryButtonTitle)
+                        .font(.system(size: 26, weight: .bold))
+                        .frame(width: 280, height: 56)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(isBusy)
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .disabled(isBusy)
             Spacer(minLength: 14)
-            Text(viewModel.footnote)
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(.gray)
-                .lineLimit(2)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 24)
-                .padding(.bottom, 16)
+            if !viewModel.footnote.isEmpty {
+                Text(viewModel.footnote)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(.gray)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 16)
+            }
         }
         .frame(minWidth: 720, minHeight: 440)
         .background(Color(red: 0.05, green: 0.05, blue: 0.06))

@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 AppKit/SwiftUI 创建 NSWindow，依赖 DeskMagnetCore.AppCoordinator 恢复未完成状态。
- * [OUTPUT]: 提供 AppDelegate，管理主窗口、关闭确认、启动恢复提示。
+ * [OUTPUT]: 提供 AppDelegate，管理主窗口、关闭自动恢复、启动恢复提示。
  * [POS]: DeskMagnetApp 的生命周期控制器，连接 macOS 窗口事件与 DeskMagnetViewModel。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -55,27 +55,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         true
     }
 
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        guard let viewModel, viewModel.isAttached else { return .terminateNow }
+        guard !closingAfterRestore else { return .terminateLater }
+        closingAfterRestore = true
+        Task { @MainActor in
+            let restored = await viewModel.restoreForTermination()
+            closingAfterRestore = false
+            sender.reply(toApplicationShouldTerminate: restored)
+        }
+        return .terminateLater
+    }
+
     func windowShouldClose(_ sender: NSWindow) -> Bool {
-        guard let viewModel, viewModel.isAttached, !closingAfterRestore else { return true }
-        let alert = NSAlert()
-        alert.messageText = "桌面整理尚未恢复。"
-        alert.informativeText = "是否恢复桌面后退出？"
-        alert.addButton(withTitle: "恢复并退出")
-        alert.addButton(withTitle: "保持现状")
-        alert.addButton(withTitle: "取消")
-        switch alert.runModal() {
-        case .alertFirstButtonReturn:
-            closingAfterRestore = true
-            Task { @MainActor in
-                await viewModel.restore()
+        guard let viewModel, viewModel.isAttached else { return true }
+        guard !closingAfterRestore else { return false }
+        closingAfterRestore = true
+        Task { @MainActor in
+            let restored = await viewModel.restoreForTermination()
+            closingAfterRestore = false
+            if restored {
                 NSApplication.shared.terminate(nil)
             }
-            return false
-        case .alertSecondButtonReturn:
-            return true
-        default:
-            return false
         }
+        return false
     }
 
     private func promptForUnfinishedStateIfNeeded(model: DeskMagnetViewModel) {

@@ -1,11 +1,10 @@
 /**
- * [INPUT]: 依赖 SwiftUI Observation、AppKit NSAlert 和 DeskMagnetCore.AppCoordinator。
- * [OUTPUT]: 提供 DeskMagnetViewModel，暴露窗口状态、按钮动作、拖动同步动作。
+ * [INPUT]: 依赖 Foundation、SwiftUI Observation 和 DeskMagnetCore.AppCoordinator。
+ * [OUTPUT]: 提供 DeskMagnetViewModel，暴露窗口状态、按钮动作、关闭恢复动作、拖动同步动作。
  * [POS]: DeskMagnetApp 的状态模型，隔离 UI 文案与核心 Finder 编排。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
-import AppKit
 import DeskMagnetCore
 import Foundation
 
@@ -44,9 +43,18 @@ final class DeskMagnetViewModel: ObservableObject {
         case .idle, .failed:
             "清理桌面"
         case .attached:
-            "恢复桌面"
+            ""
         case .working, .restoring:
             "处理中..."
+        }
+    }
+
+    var showsPrimaryButton: Bool {
+        switch phase {
+        case .attached:
+            false
+        default:
+            true
         }
     }
 
@@ -54,11 +62,11 @@ final class DeskMagnetViewModel: ObservableObject {
         if let detailNote { return detailNote }
         return switch phase {
         case .idle:
-            "不删除、移动或重命名任何文件"
+            "不删除或重命名任何文件"
         case .working:
             "正在临时优化 Finder 桌面布局"
         case .attached:
-            "拖动窗口试试看"
+            ""
         case .restoring:
             "正在恢复 Finder 桌面设置"
         case .failed:
@@ -73,11 +81,10 @@ final class DeskMagnetViewModel: ObservableObject {
     func primaryAction() {
         switch phase {
         case .attached:
-            Task { await restore() }
+            return
         case .working, .restoring:
             return
         case .idle, .failed:
-            guard confirmAttach() else { return }
             Task { await attach() }
         }
     }
@@ -100,15 +107,29 @@ final class DeskMagnetViewModel: ObservableObject {
     }
 
     func restore() async {
+        _ = await restoreDesktop(updateDetail: true)
+    }
+
+    func restoreForTermination() async -> Bool {
+        await restoreDesktop(updateDetail: false)
+    }
+
+    private func restoreDesktop(updateDetail: Bool) async -> Bool {
         phase = .restoring
         do {
             let result = try await coordinator.restore()
             attachedIconCount = 0
-            detailNote = "已恢复 \(result.restoredCount) 个图标。快照：\(result.finderSnapshotPath)"
+            if updateDetail {
+                detailNote = "已恢复 \(result.restoredCount) 个图标。快照：\(result.finderSnapshotPath)"
+            } else {
+                detailNote = nil
+            }
             phase = .idle
+            return true
         } catch {
             detailNote = nil
             phase = .failed(userMessage(for: error))
+            return false
         }
     }
 
@@ -121,15 +142,6 @@ final class DeskMagnetViewModel: ObservableObject {
         } catch {
             phase = .failed(userMessage(for: error))
         }
-    }
-
-    private func confirmAttach() -> Bool {
-        let alert = NSAlert()
-        alert.messageText = "桌面清理大师需要临时关闭 Finder 的桌面分组/自动排序。"
-        alert.informativeText = "应用会保存当前 Finder 桌面设置，并在恢复或退出时还原。不会删除、移动或重命名任何文件。"
-        alert.addButton(withTitle: "继续")
-        alert.addButton(withTitle: "取消")
-        return alert.runModal() == .alertFirstButtonReturn
     }
 
     private func userMessage(for error: Error) -> String {

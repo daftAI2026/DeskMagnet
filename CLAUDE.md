@@ -2,6 +2,9 @@
 Swift Package + Swift CLI + Finder AppleScript automation
 
 <directory>
+Assets/ - 应用视觉资产 (1子目录: AppIcon)
+</directory>
+<directory>
 docs/ - 产品规格与参考素材 (1子目录: reference)
 </directory>
 <directory>
@@ -24,5 +27,6 @@ P0 先做命令行验证器，不做 UI；Finder 真实副作用被 ShellRunning
 
 变更日志:
 2026-05-30: 播种 SwiftPM P0 验证器，建立 DeskMagnetCore/DeskMagnetCLI/Tests 分形文档，并忽略本地构建产物。
+2026-05-30: 接入清扫 glyph 作为 DeskMagnet canonical app icon，保存 SVG 源与 macOS `.icns` 产物。
 
 法则: 极简·稳定·导航·版本精确

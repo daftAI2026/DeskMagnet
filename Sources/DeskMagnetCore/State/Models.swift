@@ -45,6 +45,34 @@ public struct WindowFrame: Codable, Equatable, Sendable {
     }
 }
 
+public struct ScreenFrame: Codable, Equatable, Sendable {
+    public let x: Int
+    public let y: Int
+    public let width: Int
+    public let height: Int
+
+    public init(x: Int, y: Int, width: Int, height: Int) {
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+    }
+
+    public var maxX: Int { x + width }
+    public var maxY: Int { y + height }
+
+    public func contains(x pointX: Int, y pointY: Int) -> Bool {
+        pointX >= x && pointX <= maxX && pointY >= y && pointY <= maxY
+    }
+
+    public func clamped(_ point: Point, iconSize: Int = 48) -> Point {
+        Point(
+            x: min(max(point.x, x), maxX - iconSize),
+            y: min(max(point.y, y), maxY - iconSize)
+        )
+    }
+}
+
 public struct DesktopItem: Codable, Equatable, Sendable {
     public let name: String
     public let path: String
@@ -124,10 +152,63 @@ public struct RecoveryState: Codable, Equatable, Sendable {
 public struct RestoreResult: Equatable, Sendable {
     public let restoredCount: Int
     public let skippedCount: Int
+    public let restoredItems: [String]
+    public let skippedItems: [String]
+    public let finderSnapshotPath: String
 
-    public init(restoredCount: Int, skippedCount: Int) {
+    public init(
+        restoredCount: Int,
+        skippedCount: Int,
+        restoredItems: [String] = [],
+        skippedItems: [String] = [],
+        finderSnapshotPath: String = ""
+    ) {
         self.restoredCount = restoredCount
         self.skippedCount = skippedCount
+        self.restoredItems = restoredItems
+        self.skippedItems = skippedItems
+        self.finderSnapshotPath = finderSnapshotPath
+    }
+}
+
+public enum DragSyncMode: Equatable, Sendable {
+    case allDuringDrag
+    case sampledDuringDrag(sampleLimit: Int)
+    case finalOnly
+}
+
+public struct IconPerformanceStrategy: Equatable, Sendable {
+    public let mode: DragSyncMode
+    public let throttleMilliseconds: Int
+    public let warning: String?
+
+    public init(mode: DragSyncMode, throttleMilliseconds: Int, warning: String? = nil) {
+        self.mode = mode
+        self.throttleMilliseconds = throttleMilliseconds
+        self.warning = warning
+    }
+}
+
+public enum IconPerformancePolicy {
+    public static func strategy(for iconCount: Int) -> IconPerformanceStrategy {
+        switch iconCount {
+        case 0...30:
+            IconPerformanceStrategy(mode: .allDuringDrag, throttleMilliseconds: 100)
+        case 31...100:
+            IconPerformanceStrategy(mode: .allDuringDrag, throttleMilliseconds: 200)
+        case 101...300:
+            IconPerformanceStrategy(
+                mode: .sampledDuringDrag(sampleLimit: 60),
+                throttleMilliseconds: 250,
+                warning: "桌面图标较多，拖动时将抽样跟随，松手后全量同步。"
+            )
+        default:
+            IconPerformanceStrategy(
+                mode: .finalOnly,
+                throttleMilliseconds: 350,
+                warning: "桌面图标超过 300 个，拖动中暂停实时跟随，松手后全量同步。"
+            )
+        }
     }
 }
 

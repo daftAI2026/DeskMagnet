@@ -71,8 +71,15 @@ public final class AppCoordinator: Sendable {
     }
 
     public func syncAttachedIcons(windowFrame: WindowFrame) async throws {
+        try await syncAttachedIcons(windowFrame: windowFrame, isFinal: true)
+    }
+
+    public func syncAttachedIcons(windowFrame: WindowFrame, isFinal: Bool) async throws {
         guard let state = try store.load() else { return }
-        try await icons.moveItems(layout.moves(for: state, windowFrame: windowFrame))
+        let strategy = IconPerformancePolicy.strategy(for: state.items.count)
+        guard isFinal || strategy.mode != .finalOnly else { return }
+        let moves = sampledMoves(layout.moves(for: state, windowFrame: windowFrame), strategy: strategy, isFinal: isFinal)
+        try await icons.moveItems(moves)
     }
 
     public func restore() async throws -> RestoreResult {
@@ -91,6 +98,20 @@ public final class AppCoordinator: Sendable {
         if let moveError { throw moveError }
 
         try store.clear()
-        return RestoreResult(restoredCount: state.items.count, skippedCount: 0)
+        return RestoreResult(
+            restoredCount: state.items.count,
+            skippedCount: 0,
+            restoredItems: state.items.map(\.name),
+            skippedItems: [],
+            finderSnapshotPath: state.finderSnapshotPath
+        )
+    }
+
+    private func sampledMoves(_ moves: [IconMove], strategy: IconPerformanceStrategy, isFinal: Bool) -> [IconMove] {
+        guard !isFinal else { return moves }
+        if case let .sampledDuringDrag(limit) = strategy.mode, moves.count > limit {
+            return Array(moves.prefix(limit))
+        }
+        return moves
     }
 }

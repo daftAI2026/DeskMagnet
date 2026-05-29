@@ -45,6 +45,8 @@ struct AppCoordinatorTests {
         let result = try await coordinator.restore()
 
         #expect(result.restoredCount == 1)
+        #expect(result.restoredItems == ["A.txt"])
+        #expect(result.finderSnapshotPath == store.finderSnapshotURL.path)
         #expect(icons.moveBatches == [[IconMove(name: "A.txt", position: Point(x: 100, y: 120))]])
         #expect(settings.restoredSnapshotURL == store.finderSnapshotURL)
         #expect(try store.load() == nil)

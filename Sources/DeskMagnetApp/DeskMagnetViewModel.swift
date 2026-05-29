@@ -20,9 +20,11 @@ final class DeskMagnetViewModel: ObservableObject {
     }
 
     @Published private(set) var phase: Phase = .idle
+    @Published private(set) var detailNote: String?
     var windowFrameProvider: (() -> WindowFrame?)?
 
     private let coordinator: AppCoordinator
+    private var attachedIconCount = 0
 
     init(coordinator: AppCoordinator) {
         self.coordinator = coordinator
@@ -49,7 +51,8 @@ final class DeskMagnetViewModel: ObservableObject {
     }
 
     var footnote: String {
-        switch phase {
+        if let detailNote { return detailNote }
+        return switch phase {
         case .idle:
             "不删除、移动或重命名任何文件"
         case .working:
@@ -61,6 +64,10 @@ final class DeskMagnetViewModel: ObservableObject {
         case .failed:
             "需要允许 DeskMagnet 控制 Finder"
         }
+    }
+
+    var followThrottleMilliseconds: Int {
+        IconPerformancePolicy.strategy(for: attachedIconCount).throttleMilliseconds
     }
 
     func primaryAction() {
@@ -83,8 +90,11 @@ final class DeskMagnetViewModel: ObservableObject {
         phase = .working("正在清理桌面...", 0.25)
         do {
             let state = try await coordinator.attach(windowFrame: frame)
+            attachedIconCount = state.items.count
+            detailNote = IconPerformancePolicy.strategy(for: state.items.count).warning
             phase = .attached(state.items.count)
         } catch {
+            detailNote = nil
             phase = .failed(userMessage(for: error))
         }
     }
@@ -92,9 +102,12 @@ final class DeskMagnetViewModel: ObservableObject {
     func restore() async {
         phase = .restoring
         do {
-            _ = try await coordinator.restore()
+            let result = try await coordinator.restore()
+            attachedIconCount = 0
+            detailNote = "已恢复 \(result.restoredCount) 个图标。快照：\(result.finderSnapshotPath)"
             phase = .idle
         } catch {
+            detailNote = nil
             phase = .failed(userMessage(for: error))
         }
     }
@@ -102,7 +115,7 @@ final class DeskMagnetViewModel: ObservableObject {
     func sync(windowFrame: WindowFrame, final: Bool) async {
         guard isAttached else { return }
         do {
-            try await coordinator.syncAttachedIcons(windowFrame: windowFrame)
+            try await coordinator.syncAttachedIcons(windowFrame: windowFrame, isFinal: final)
         } catch where !final {
             return
         } catch {

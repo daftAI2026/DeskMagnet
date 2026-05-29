@@ -97,9 +97,9 @@ private struct StatusSection: View {
     private var subtitle: String {
         switch phase {
         case .idle:
-            "把桌面图标吸到窗口上。"
+            "把真实 Finder 桌面图标吸到窗口下方。"
         case .working:
-            "正在保存设置并读取图标坐标"
+            "正在保存 Finder 设置并读取图标坐标"
         case let .attached(count):
             "已吸附 \(count) 个图标"
         case .restoring:

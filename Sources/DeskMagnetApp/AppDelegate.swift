@@ -19,7 +19,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         do {
             let store = try RecoveryStore.live()
-            let coordinator = AppCoordinator(store: store)
+            let coordinator = AppCoordinator(store: store, layout: LayoutEngine(screens: NSScreen.deskMagnetScreens))
             let model = DeskMagnetViewModel(coordinator: coordinator)
             let content = ContentView(viewModel: model)
             let window = NSWindow(
@@ -40,6 +40,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 Task { @MainActor in
                     await model?.sync(windowFrame: frame, final: isFinal)
                 }
+            } throttleMilliseconds: { [weak model] in
+                model?.followThrottleMilliseconds ?? 120
             }
             window.makeKeyAndOrderFront(nil)
             promptForUnfinishedStateIfNeeded(model: model)
@@ -103,5 +105,18 @@ private extension NSWindow {
             width: Int(frame.size.width.rounded()),
             height: Int(frame.size.height.rounded())
         )
+    }
+}
+
+private extension NSScreen {
+    static var deskMagnetScreens: [ScreenFrame] {
+        screens.map {
+            ScreenFrame(
+                x: Int($0.visibleFrame.origin.x.rounded()),
+                y: Int($0.visibleFrame.origin.y.rounded()),
+                width: Int($0.visibleFrame.size.width.rounded()),
+                height: Int($0.visibleFrame.size.height.rounded())
+            )
+        }
     }
 }

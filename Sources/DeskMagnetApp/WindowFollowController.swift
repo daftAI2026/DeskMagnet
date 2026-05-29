@@ -13,13 +13,19 @@ import Foundation
 final class WindowFollowController {
     private weak var window: NSWindow?
     private let onMove: (WindowFrame, Bool) -> Void
+    private let throttleMilliseconds: () -> Int
     private var lastSync = Date.distantPast
     private var finalTimer: Timer?
     private var observer: NSObjectProtocol?
 
-    init(window: NSWindow, onMove: @escaping (WindowFrame, Bool) -> Void) {
+    init(
+        window: NSWindow,
+        onMove: @escaping (WindowFrame, Bool) -> Void,
+        throttleMilliseconds: @escaping () -> Int
+    ) {
         self.window = window
         self.onMove = onMove
+        self.throttleMilliseconds = throttleMilliseconds
         self.observer = NotificationCenter.default.addObserver(
             forName: NSWindow.didMoveNotification,
             object: window,
@@ -41,7 +47,8 @@ final class WindowFollowController {
     private func windowDidMove() {
         guard let frame = window?.deskMagnetFollowFrame else { return }
         let now = Date()
-        if now.timeIntervalSince(lastSync) >= 0.12 {
+        let interval = Double(throttleMilliseconds()) / 1000
+        if now.timeIntervalSince(lastSync) >= interval {
             lastSync = now
             onMove(frame, false)
         }

@@ -1,5 +1,5 @@
 /**
- * [INPUT]: 依赖 Foundation、SwiftUI Observation 和 DeskMagnetCore.AppCoordinator。
+ * [INPUT]: 依赖 Foundation、SwiftUI Observation、AppLocalization 和 DeskMagnetCore.AppCoordinator。
  * [OUTPUT]: 提供 DeskMagnetViewModel，暴露窗口状态、按钮动作、关闭恢复动作、拖动同步动作。
  * [POS]: DeskMagnetApp 的状态模型，隔离 UI 文案与核心 Finder 编排。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
@@ -12,7 +12,7 @@ import Foundation
 final class DeskMagnetViewModel: ObservableObject {
     enum Phase: Equatable {
         case idle
-        case working(String, Double)
+        case working(Double)
         case attached(Int)
         case restoring
         case failed(String)
@@ -23,10 +23,12 @@ final class DeskMagnetViewModel: ObservableObject {
     var windowFrameProvider: (() -> WindowFrame?)?
 
     private let coordinator: AppCoordinator
+    private let languageStore: AppLanguageStore
     private var attachedIconCount = 0
 
-    init(coordinator: AppCoordinator) {
+    init(coordinator: AppCoordinator, languageStore: AppLanguageStore) {
         self.coordinator = coordinator
+        self.languageStore = languageStore
     }
 
     var isAttached: Bool {
@@ -41,11 +43,31 @@ final class DeskMagnetViewModel: ObservableObject {
     var primaryButtonTitle: String {
         switch phase {
         case .idle, .failed:
-            "一键清理"
+            languageStore.strings.cleanButton
         case .attached:
             ""
         case .working, .restoring:
-            "处理中..."
+            languageStore.strings.cleaningTitle
+        }
+    }
+
+    var canClean: Bool {
+        switch phase {
+        case .idle, .failed:
+            true
+        default:
+            false
+        }
+    }
+
+    var canRestore: Bool {
+        switch phase {
+        case .attached:
+            true
+        case .idle, .failed:
+            hasUnfinishedState
+        default:
+            false
         }
     }
 
@@ -70,7 +92,7 @@ final class DeskMagnetViewModel: ObservableObject {
         case .restoring:
             ""
         case .failed:
-            "需要允许 DeskMagnet 控制 Finder"
+            languageStore.strings.permissionFootnote
         }
     }
 
@@ -91,10 +113,10 @@ final class DeskMagnetViewModel: ObservableObject {
 
     func attach() async {
         guard let frame = windowFrameProvider?() else {
-            phase = .failed("无法读取主窗口位置。")
+            phase = .failed(languageStore.strings.windowPositionUnavailable)
             return
         }
-        phase = .working("正在清理桌面...", 0.25)
+        phase = .working(0.25)
         do {
             let state = try await coordinator.attach(windowFrame: frame)
             attachedIconCount = state.items.count
@@ -142,7 +164,7 @@ final class DeskMagnetViewModel: ObservableObject {
 
     private func userMessage(for error: Error) -> String {
         if String(describing: error).contains("-1743") {
-            return "需要允许 DeskMagnet 控制 Finder。请前往：系统设置 -> 隐私与安全性 -> 自动化。"
+            return languageStore.strings.automationPermissionRequired
         }
         return String(describing: error)
     }

@@ -1,5 +1,5 @@
 /**
- * [INPUT]: 依赖 SwiftUI 与 DeskMagnetViewModel 的 Phase 状态。
+ * [INPUT]: 依赖 SwiftUI、DeskMagnetViewModel 的 Phase 状态和 AppLocalization 文案。
  * [OUTPUT]: 提供亮色 DeskMagnet 主窗口内容视图。
  * [POS]: DeskMagnetApp 的 UI 表层，以层级和节奏统一状态与动作入口，不直接操作 Finder。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
@@ -9,14 +9,16 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var viewModel: DeskMagnetViewModel
+    @ObservedObject var languageStore: AppLanguageStore
 
     var body: some View {
         VStack(spacing: 0) {
-            TitleSection()
+            TitleSection(strings: languageStore.strings)
             Divider()
                 .overlay(DeskMagnetPalette.divider)
             ContentPanel(
                 phase: viewModel.phase,
+                strings: languageStore.strings,
                 primaryButtonTitle: viewModel.primaryButtonTitle,
                 showsPrimaryButton: viewModel.showsPrimaryButton,
                 footnote: viewModel.footnote,
@@ -44,6 +46,7 @@ struct ContentView: View {
 
 private struct ContentPanel: View {
     let phase: DeskMagnetViewModel.Phase
+    let strings: AppStrings
     let primaryButtonTitle: String
     let showsPrimaryButton: Bool
     let footnote: String
@@ -53,6 +56,7 @@ private struct ContentPanel: View {
     var body: some View {
         BodyActionGroup(
             phase: phase,
+            strings: strings,
             primaryButtonTitle: primaryButtonTitle,
             showsPrimaryButton: showsPrimaryButton,
             footnote: footnote,
@@ -87,14 +91,19 @@ private enum DeskMagnetRhythm {
 }
 
 private struct TitleSection: View {
+    let strings: AppStrings
+
     var body: some View {
         GeometryReader { proxy in
             HStack(spacing: DeskMagnetRhythm.md) {
-                Text("桌面清理大师")
+                Text(strings.appName)
                     .font(.system(size: 36, weight: .semibold))
                     .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                    .layoutPriority(1)
                 Spacer()
-                StatusBadge()
+                StatusBadge(text: strings.badge)
             }
             .padding(.horizontal, DeskMagnetRhythm.canvasInset)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
@@ -106,12 +115,16 @@ private struct TitleSection: View {
 }
 
 private struct StatusBadge: View {
+    let text: String
+
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: "checkmark.shield.fill")
                 .font(.system(size: 13, weight: .semibold))
-            Text("革命性创新技术，优化电脑使用体验")
+            Text(text)
                 .font(.system(size: 13, weight: .medium))
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
         }
         .foregroundStyle(.white)
         .padding(.horizontal, 10)
@@ -120,11 +133,13 @@ private struct StatusBadge: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(.white.opacity(0.18))
         }
+        .frame(maxWidth: 310)
     }
 }
 
 private struct StatusSection: View {
     let phase: DeskMagnetViewModel.Phase
+    let strings: AppStrings
 
     var body: some View {
         VStack(spacing: DeskMagnetRhythm.sm) {
@@ -155,35 +170,35 @@ private struct StatusSection: View {
         switch phase {
         case .idle:
             PhasePresentation(
-                title: "一键清理，还你干净桌面",
+                title: strings.idleTitle,
                 subtitle: "",
                 symbolName: "rectangle.stack.badge.plus",
                 color: DeskMagnetPalette.primary
             )
-        case let .working(text, _):
+        case .working:
             PhasePresentation(
-                title: text,
+                title: strings.cleaningTitle,
                 subtitle: "",
                 symbolName: "wand.and.stars",
                 color: DeskMagnetPalette.primary
             )
         case .attached:
             PhasePresentation(
-                title: "桌面已整理完毕",
+                title: strings.attachedTitle,
                 subtitle: "",
                 symbolName: "checkmark.circle.fill",
                 color: DeskMagnetPalette.primary
             )
         case .restoring:
             PhasePresentation(
-                title: "正在恢复桌面",
-                subtitle: "图标和 Finder 设置会回到启动前",
+                title: strings.restoringTitle,
+                subtitle: strings.restoringSubtitle,
                 symbolName: "arrow.counterclockwise.circle",
                 color: DeskMagnetPalette.primary
             )
         case let .failed(message):
             PhasePresentation(
-                title: "清理失败",
+                title: strings.failedTitle,
                 subtitle: message,
                 symbolName: "exclamationmark.triangle.fill",
                 color: DeskMagnetPalette.danger
@@ -201,6 +216,7 @@ private struct PhasePresentation {
 
 private struct BodyActionGroup: View {
     let phase: DeskMagnetViewModel.Phase
+    let strings: AppStrings
     let primaryButtonTitle: String
     let showsPrimaryButton: Bool
     let footnote: String
@@ -209,7 +225,7 @@ private struct BodyActionGroup: View {
 
     var body: some View {
         VStack(spacing: DeskMagnetRhythm.buttonGap) {
-            StatusSection(phase: phase)
+            StatusSection(phase: phase, strings: strings)
             if showsActionSection {
                 ActionSection(
                     primaryButtonTitle: primaryButtonTitle,
@@ -286,7 +302,7 @@ private struct ProgressSection: View {
 
     var body: some View {
         Group {
-            if case let .working(_, progress) = phase {
+            if case let .working(progress) = phase {
                 ProgressView(value: progress)
                     .tint(DeskMagnetPalette.primary)
                     .frame(width: 210)

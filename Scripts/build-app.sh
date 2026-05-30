@@ -31,7 +31,7 @@ cat > "$CONTENTS/Info.plist" <<'PLIST'
   <key>CFBundleIdentifier</key>
   <string>cool.sofxcking.deskmagnet</string>
   <key>CFBundleName</key>
-  <string>DeskMagnet</string>
+  <string>桌面清理大师</string>
   <key>CFBundleDisplayName</key>
   <string>桌面清理大师</string>
   <key>CFBundleIconFile</key>

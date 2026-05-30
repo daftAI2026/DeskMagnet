@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 AppKit/SwiftUI 创建 NSWindow，依赖 DeskMagnetCore.AppCoordinator 恢复未完成状态。
- * [OUTPUT]: 提供 AppDelegate，管理固定尺寸亮色主窗口、关闭自动恢复、启动恢复提示。
+ * [OUTPUT]: 提供 AppDelegate，管理固定尺寸亮色主窗口、启动居中、关闭自动恢复、启动恢复提示。
  * [POS]: DeskMagnetApp 的生命周期控制器，连接 macOS 窗口事件与 DeskMagnetViewModel。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -36,10 +36,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             window.titlebarAppearsTransparent = true
             window.minSize = windowSize
             window.maxSize = windowSize
+            window.isRestorable = false
             window.appearance = NSAppearance(named: .aqua)
             window.backgroundColor = .controlBackgroundColor
             window.contentView = NSHostingView(rootView: content)
-            window.center()
+            window.deskMagnetCenterOnMainScreen()
             window.delegate = self
             model.windowFrameProvider = { [weak window] in window?.deskMagnetFrame(converter: converter) }
             self.window = window
@@ -109,6 +110,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 }
 
 private extension NSWindow {
+    func deskMagnetCenterOnMainScreen() {
+        let visibleFrame = NSScreen.main?.visibleFrame ?? NSScreen.screens.first?.visibleFrame ?? frame
+        setFrameOrigin(
+            NSPoint(
+                x: visibleFrame.midX - frame.width / 2,
+                y: visibleFrame.midY - frame.height / 2
+            )
+        )
+    }
+
     func deskMagnetFrame(converter: DesktopCoordinateConverter) -> WindowFrame {
         converter.windowFrameFromAppKit(
             x: Int(frame.origin.x.rounded()),

@@ -41,7 +41,7 @@ final class DeskMagnetViewModel: ObservableObject {
     var primaryButtonTitle: String {
         switch phase {
         case .idle, .failed:
-            "清理桌面"
+            "一键清理"
         case .attached:
             ""
         case .working, .restoring:

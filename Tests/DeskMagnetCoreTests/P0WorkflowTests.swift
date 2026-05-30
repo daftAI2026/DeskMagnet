@@ -55,6 +55,17 @@ struct P0WorkflowTests {
         }
         #expect(arrangementAttempts.count == 2)
     }
+
+    @Test("Finder restarts in background to preserve app focus")
+    func settingsManagerOpensFinderWithoutActivation() async throws {
+        let shell = RecordingShellRunner.arrangementSucceedsAfterRetry()
+        let manager = FinderSettingsManager(shell: shell)
+
+        try await manager.enterCompatibilityMode(snapshotURL: URL(fileURLWithPath: "/tmp/DeskMagnetTests/finder-before.plist"))
+
+        #expect(shell.commands.contains(["/usr/bin/open", "-g", "-a", "Finder"]))
+        #expect(!shell.commands.contains(["/usr/bin/open", "-a", "Finder"]))
+    }
 }
 
 private final class RecordingShellRunner: ShellRunning, @unchecked Sendable {

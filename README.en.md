@@ -23,6 +23,12 @@ DeskMagnet only changes Finder desktop icon display coordinates and temporary Fi
 
 On first real cleanup, macOS asks whether DeskMagnet may control Finder. If permission is denied, the app shows an Automation permission error. You can manage it later in System Settings -> Privacy & Security -> Automation.
 
+## Menus and Language
+
+The app follows the system language by default. You can also switch languages from the macOS menu bar: Simplified Chinese, Traditional Chinese, English, Japanese, and Korean.
+
+The cleanup action is exposed as its own top-level menu. The main app menu keeps Restore Desktop and Quit. If Finder steals focus during cleanup, the app brings its main window back when the operation finishes.
+
 ## Local Development
 
 ```bash
@@ -53,6 +59,24 @@ open build/DeskMagnet.app
 ```
 
 The current artifact is an ad-hoc signed `.app`, not an Apple Developer ID signed or notarized build. Public distribution still needs a Developer ID certificate, hardened runtime, `notarytool`, and stapler validation.
+
+## GitHub Runner Packaging
+
+GitHub Actions uses `.github/workflows/build.yml`. Regular pushes and pull requests only run `swift build --product DeskMagnetApp` and `swift test`.
+
+Only two paths create an `.app.zip` artifact:
+
+- Run the workflow manually with `workflow_dispatch`.
+- Push a `v*` tag, for example `v0.1.0`.
+
+The packaging job uploads a `DeskMagnet-macOS` artifact containing `DeskMagnet.app.zip`. CI and local builds share `Scripts/build-app.sh`, so a local packaging pass should match the Runner behavior.
+
+## Known Limitations
+
+- macOS only.
+- Artifacts are ad-hoc signed, without Developer ID signing or notarization.
+- The first real cleanup requires Finder Automation permission.
+- With many desktop icons, drag syncing is throttled and a final sync runs after the drag ends.
 
 ## Project Structure
 

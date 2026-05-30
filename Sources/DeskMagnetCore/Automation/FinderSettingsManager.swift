@@ -1,5 +1,5 @@
 /**
- * [INPUT]: 依赖 ShellRunning 执行 defaults、osascript、open、pgrep，依赖轮询等待 Finder 状态。
+ * [INPUT]: 依赖 ShellRunning 执行 defaults、osascript、open -g、pgrep，依赖轮询等待 Finder 状态。
  * [OUTPUT]: 对外提供 FinderSettingsManager.snapshotFinderSettings()、enterCompatibilityMode(snapshotURL:)、restoreFinderSettings(snapshotURL:)。
  * [POS]: DeskMagnetCore 的 Finder 偏好生命周期管理器，保证修改前快照、失败后可恢复。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
@@ -39,7 +39,7 @@ public final class FinderSettingsManager: Sendable {
     }
 
     private func openFinderAndWait() async throws {
-        _ = try await shell.checkedRun("/usr/bin/open", ["-a", "Finder"])
+        _ = try await shell.checkedRun("/usr/bin/open", ["-g", "-a", "Finder"])
         try await waitForFinder(running: true, timeout: 10)
     }
 

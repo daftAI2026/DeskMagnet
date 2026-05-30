@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 Foundation、SwiftUI Observation、AppLocalization 和 DeskMagnetCore.AppCoordinator。
- * [OUTPUT]: 提供 DeskMagnetViewModel，暴露窗口状态、按钮动作、关闭恢复动作、拖动同步动作。
+ * [OUTPUT]: 提供 DeskMagnetViewModel，暴露窗口状态、按钮动作、关闭恢复动作、拖动同步动作和焦点恢复回调。
  * [POS]: DeskMagnetApp 的状态模型，隔离 UI 文案与核心 Finder 编排。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -21,6 +21,7 @@ final class DeskMagnetViewModel: ObservableObject {
     @Published private(set) var phase: Phase = .idle
     @Published private(set) var detailNote: String?
     var windowFrameProvider: (() -> WindowFrame?)?
+    var focusRestorer: (() -> Void)?
 
     private let coordinator: AppCoordinator
     private let languageStore: AppLanguageStore
@@ -116,6 +117,7 @@ final class DeskMagnetViewModel: ObservableObject {
             phase = .failed(languageStore.strings.windowPositionUnavailable)
             return
         }
+        defer { focusRestorer?() }
         phase = .working(0.25)
         do {
             let state = try await coordinator.attach(windowFrame: frame)
@@ -137,6 +139,7 @@ final class DeskMagnetViewModel: ObservableObject {
     }
 
     private func restoreDesktop() async -> Bool {
+        defer { focusRestorer?() }
         phase = .restoring
         do {
             _ = try await coordinator.restore()

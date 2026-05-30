@@ -182,9 +182,9 @@ private struct StatusSection: View {
                 symbolName: "wand.and.stars",
                 color: DeskMagnetPalette.primary
             )
-        case .attached:
+        case let .attached(count):
             PhasePresentation(
-                title: strings.attachedTitle,
+                title: strings.attachedTitle(iconCount: count),
                 subtitle: "",
                 symbolName: "checkmark.circle.fill",
                 color: DeskMagnetPalette.primary

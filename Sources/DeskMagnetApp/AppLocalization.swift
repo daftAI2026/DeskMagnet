@@ -62,7 +62,7 @@ struct AppStrings: Equatable {
     let idleTitle: String
     let cleanButton: String
     let cleaningTitle: String
-    let attachedTitle: String
+    let attachedTitleFormat: String
     let restoringTitle: String
     let restoringSubtitle: String
     let failedTitle: String
@@ -89,7 +89,7 @@ struct AppStrings: Equatable {
                 idleTitle: "一键清理，还你干净桌面",
                 cleanButton: "一键清理",
                 cleaningTitle: "正在清理桌面...",
-                attachedTitle: "桌面已整理完毕",
+                attachedTitleFormat: "清理完成，已处理 %d 个图标",
                 restoringTitle: "正在恢复桌面",
                 restoringSubtitle: "图标和 Finder 设置会回到启动前",
                 failedTitle: "清理失败",
@@ -114,7 +114,7 @@ struct AppStrings: Equatable {
                 idleTitle: "一鍵清理，還你乾淨桌面",
                 cleanButton: "一鍵清理",
                 cleaningTitle: "正在清理桌面...",
-                attachedTitle: "桌面已整理完畢",
+                attachedTitleFormat: "清理完成，已處理 %d 個圖示",
                 restoringTitle: "正在恢復桌面",
                 restoringSubtitle: "圖示和 Finder 設定會回到啟動前",
                 failedTitle: "清理失敗",
@@ -139,7 +139,7 @@ struct AppStrings: Equatable {
                 idleTitle: "Clear your desktop in one click",
                 cleanButton: "Clean Desktop",
                 cleaningTitle: "Cleaning desktop...",
-                attachedTitle: "Desktop cleaned",
+                attachedTitleFormat: "Cleanup complete, processed %d icons",
                 restoringTitle: "Restoring desktop",
                 restoringSubtitle: "Icons and Finder settings return to the launch state",
                 failedTitle: "Cleanup failed",
@@ -164,7 +164,7 @@ struct AppStrings: Equatable {
                 idleTitle: "ワンクリックで、デスクトップをきれいに",
                 cleanButton: "一括整理",
                 cleaningTitle: "デスクトップを整理中...",
-                attachedTitle: "デスクトップを整理しました",
+                attachedTitleFormat: "整理完了、%d 個のアイコンを処理しました",
                 restoringTitle: "デスクトップを復元中",
                 restoringSubtitle: "アイコンと Finder 設定を起動前に戻します",
                 failedTitle: "整理に失敗しました",
@@ -189,7 +189,7 @@ struct AppStrings: Equatable {
                 idleTitle: "한 번에 정리하고 깨끗한 데스크톱으로",
                 cleanButton: "한 번에 정리",
                 cleaningTitle: "데스크톱 정리 중...",
-                attachedTitle: "데스크톱 정리 완료",
+                attachedTitleFormat: "정리 완료, 아이콘 %d개 처리됨",
                 restoringTitle: "데스크톱 복원 중",
                 restoringSubtitle: "아이콘과 Finder 설정이 실행 전 상태로 돌아갑니다",
                 failedTitle: "정리 실패",
@@ -208,6 +208,10 @@ struct AppStrings: Equatable {
                 permissionFootnote: "DeskMagnet 이 Finder 를 제어하도록 허용하세요"
             )
         }
+    }
+
+    func attachedTitle(iconCount: Int) -> String {
+        String(format: attachedTitleFormat, iconCount)
     }
 }
 

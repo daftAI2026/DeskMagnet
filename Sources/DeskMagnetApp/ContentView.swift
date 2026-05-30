@@ -51,29 +51,22 @@ private struct ContentPanel: View {
     let primaryAction: () -> Void
 
     var body: some View {
-        VStack(spacing: DeskMagnetRhythm.contentGap) {
-            StatusSection(phase: phase)
-                .frame(maxWidth: .infinity, alignment: .center)
-            ActionSection(
-                primaryButtonTitle: primaryButtonTitle,
-                showsPrimaryButton: showsPrimaryButton,
-                footnote: footnote,
-                isBusy: isBusy,
-                phase: phase,
-                primaryAction: primaryAction
-            )
-            .frame(maxWidth: .infinity, minHeight: 64, alignment: .center)
-        }
+        BodyActionGroup(
+            phase: phase,
+            primaryButtonTitle: primaryButtonTitle,
+            showsPrimaryButton: showsPrimaryButton,
+            footnote: footnote,
+            isBusy: isBusy,
+            primaryAction: primaryAction
+        )
         .padding(.horizontal, DeskMagnetRhythm.section)
         .padding(.vertical, DeskMagnetRhythm.lg)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        .offset(y: -DeskMagnetRhythm.bodyLift)
     }
 }
 
 private enum DeskMagnetPalette {
     static let primary = Color(red: 0.08, green: 0.82, blue: 0.39)
-    static let attention = Color(red: 0.00, green: 0.48, blue: 0.50)
     static let danger = Color(red: 0.76, green: 0.15, blue: 0.16)
     static let divider = Color.black.opacity(0.08)
     static let window = Color(red: 0.95, green: 0.96, blue: 0.97)
@@ -88,22 +81,25 @@ private enum DeskMagnetRhythm {
     static let section: CGFloat = 48
     static let canvasInset: CGFloat = 48
     static let bodyInset: CGFloat = 24
-    static let bodyLift: CGFloat = 22
+    static let buttonGap: CGFloat = 36
     static let contentGap: CGFloat = 10
-    static let titleHeight: CGFloat = 128
+    static let titleHeight: CGFloat = 104
 }
 
 private struct TitleSection: View {
     var body: some View {
-        HStack(spacing: DeskMagnetRhythm.md) {
-            Text("桌面清理大师")
-                .font(.system(size: 28, weight: .semibold))
-                .foregroundStyle(.white)
-            Spacer()
-            StatusBadge()
+        GeometryReader { proxy in
+            HStack(spacing: DeskMagnetRhythm.md) {
+                Text("桌面清理大师")
+                    .font(.system(size: 36, weight: .semibold))
+                    .foregroundStyle(.white)
+                Spacer()
+                StatusBadge()
+            }
+            .padding(.horizontal, DeskMagnetRhythm.canvasInset)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            .offset(y: -proxy.safeAreaInsets.top / 2)
         }
-        .padding(.horizontal, DeskMagnetRhythm.canvasInset)
-        .padding(.vertical, DeskMagnetRhythm.lg)
         .frame(height: DeskMagnetRhythm.titleHeight)
         .background(DeskMagnetPalette.primary)
     }
@@ -131,13 +127,13 @@ private struct StatusSection: View {
     let phase: DeskMagnetViewModel.Phase
 
     var body: some View {
-        VStack(spacing: DeskMagnetRhythm.md) {
+        VStack(spacing: DeskMagnetRhythm.sm) {
             Image(systemName: presentation.symbolName)
-                .font(.system(size: 42, weight: .medium))
+                .font(.system(size: 40, weight: .light))
                 .foregroundStyle(presentation.color)
                 .frame(width: 56, height: 56)
             Text(presentation.title)
-                .font(.system(size: 33, weight: .medium))
+                .font(.system(size: 32, weight: .light))
                 .foregroundStyle(presentation.color)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
@@ -159,7 +155,7 @@ private struct StatusSection: View {
         switch phase {
         case .idle:
             PhasePresentation(
-                title: "一键清理，还你整洁桌面",
+                title: "一键清理，还你干净桌面",
                 subtitle: "",
                 symbolName: "rectangle.stack.badge.plus",
                 color: DeskMagnetPalette.primary
@@ -171,10 +167,10 @@ private struct StatusSection: View {
                 symbolName: "wand.and.stars",
                 color: DeskMagnetPalette.primary
             )
-        case let .attached(count):
+        case .attached:
             PhasePresentation(
                 title: "桌面已整理完毕",
-                subtitle: "已整理 \(count) 个图标",
+                subtitle: "",
                 symbolName: "checkmark.circle.fill",
                 color: DeskMagnetPalette.primary
             )
@@ -183,7 +179,7 @@ private struct StatusSection: View {
                 title: "正在恢复桌面",
                 subtitle: "图标和 Finder 设置会回到启动前",
                 symbolName: "arrow.counterclockwise.circle",
-                color: DeskMagnetPalette.attention
+                color: DeskMagnetPalette.primary
             )
         case let .failed(message):
             PhasePresentation(
@@ -203,6 +199,42 @@ private struct PhasePresentation {
     let color: Color
 }
 
+private struct BodyActionGroup: View {
+    let phase: DeskMagnetViewModel.Phase
+    let primaryButtonTitle: String
+    let showsPrimaryButton: Bool
+    let footnote: String
+    let isBusy: Bool
+    let primaryAction: () -> Void
+
+    var body: some View {
+        VStack(spacing: DeskMagnetRhythm.buttonGap) {
+            StatusSection(phase: phase)
+            if showsActionSection {
+                ActionSection(
+                    primaryButtonTitle: primaryButtonTitle,
+                    showsPrimaryButton: showsPrimaryButton,
+                    footnote: footnote,
+                    isBusy: isBusy,
+                    phase: phase,
+                    primaryAction: primaryAction
+                )
+            }
+        }
+    }
+
+    private var showsActionSection: Bool {
+        switch phase {
+        case .attached:
+            !footnote.isEmpty
+        case .working, .restoring:
+            true
+        default:
+            showsPrimaryButton || !footnote.isEmpty
+        }
+    }
+}
+
 private struct ActionSection: View {
     let primaryButtonTitle: String
     let showsPrimaryButton: Bool
@@ -219,7 +251,7 @@ private struct ActionSection: View {
             if showsPrimaryButton {
                 Button(action: primaryAction) {
                     Text(primaryButtonTitle)
-                        .font(.system(size: 18, weight: .medium))
+                        .font(.system(size: 18, weight: .light))
                         .foregroundStyle(.white)
                         .frame(width: 252, height: 52)
                         .background {
@@ -236,7 +268,7 @@ private struct ActionSection: View {
                 FootnoteSection(text: footnote)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 
     private var showsProgress: Bool {
@@ -261,7 +293,7 @@ private struct ProgressSection: View {
             } else if case .restoring = phase {
                 ProgressView()
                     .controlSize(.small)
-                    .tint(DeskMagnetPalette.attention)
+                    .tint(DeskMagnetPalette.primary)
             }
         }
         .frame(height: 28)

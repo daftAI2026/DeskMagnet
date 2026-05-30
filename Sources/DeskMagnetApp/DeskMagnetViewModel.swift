@@ -107,23 +107,19 @@ final class DeskMagnetViewModel: ObservableObject {
     }
 
     func restore() async {
-        _ = await restoreDesktop(updateDetail: true)
+        _ = await restoreDesktop()
     }
 
     func restoreForTermination() async -> Bool {
-        await restoreDesktop(updateDetail: false)
+        await restoreDesktop()
     }
 
-    private func restoreDesktop(updateDetail: Bool) async -> Bool {
+    private func restoreDesktop() async -> Bool {
         phase = .restoring
         do {
-            let result = try await coordinator.restore()
+            _ = try await coordinator.restore()
             attachedIconCount = 0
-            if updateDetail {
-                detailNote = "已恢复 \(result.restoredCount) 个图标。快照：\(result.finderSnapshotPath)"
-            } else {
-                detailNote = nil
-            }
+            detailNote = nil
             phase = .idle
             return true
         } catch {

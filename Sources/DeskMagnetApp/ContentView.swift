@@ -74,12 +74,14 @@ private struct StatusSection: View {
                 .multilineTextAlignment(.center)
                 .lineLimit(3)
                 .padding(.horizontal, 24)
-            Text(subtitle)
-                .font(.system(size: 24, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.72))
-                .multilineTextAlignment(.center)
-                .lineLimit(3)
-                .padding(.horizontal, 24)
+            if !subtitle.isEmpty {
+                Text(subtitle)
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.72))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(3)
+                    .padding(.horizontal, 24)
+            }
         }
     }
 
@@ -103,7 +105,7 @@ private struct StatusSection: View {
         case .idle:
             ""
         case .working:
-            "正在保存 Finder 设置并读取图标坐标"
+            ""
         case let .attached(count):
             "已整理 \(count) 个图标"
         case .restoring:

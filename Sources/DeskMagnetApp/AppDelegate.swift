@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 AppKit/SwiftUI 创建 NSWindow，依赖 DeskMagnetCore.AppCoordinator 恢复未完成状态。
- * [OUTPUT]: 提供 AppDelegate，管理主窗口、关闭自动恢复、启动恢复提示。
+ * [OUTPUT]: 提供 AppDelegate，管理固定尺寸主窗口、关闭自动恢复、启动恢复提示。
  * [POS]: DeskMagnetApp 的生命周期控制器，连接 macOS 窗口事件与 DeskMagnetViewModel。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -23,14 +23,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             let coordinator = AppCoordinator(store: store, layout: LayoutEngine(screens: NSScreen.deskMagnetScreens(converter: converter)))
             let model = DeskMagnetViewModel(coordinator: coordinator)
             let content = ContentView(viewModel: model)
+            let windowSize = NSSize(width: 800, height: 520)
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 800, height: 520),
-                styleMask: [.titled, .closable, .miniaturizable, .resizable],
+                contentRect: NSRect(origin: .zero, size: windowSize),
+                styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
             )
             window.title = "桌面清理大师"
-            window.minSize = NSSize(width: 720, height: 440)
+            window.minSize = windowSize
+            window.maxSize = windowSize
             window.contentView = NSHostingView(rootView: content)
             window.center()
             window.delegate = self

@@ -3,7 +3,7 @@
 
 成员清单
 DesktopCoordinateConverter.swift: 坐标系转换，将 AppKit 左下角窗口/屏幕坐标转成 Finder 左上角桌面坐标
-LayoutEngine.swift: 纯布局计算，按窗口外安全区域选择 Finder 图标锚点，下方不足时回退到侧边/上方
+LayoutEngine.swift: 纯布局计算，把 Finder 图标锚点压进窗口内部安全区并确定性散布，由桌面层天然 Z 轴遮盖
 Models.swift: 领域数据模型，定义 Point、ScreenFrame、DesktopItem、IconMove、RecoveryState、IconPerformancePolicy、DeskMagnetError
 RecoveryStore.swift: 恢复状态存储，读写 Application Support 下的 state.json 与 Finder 快照路径
 

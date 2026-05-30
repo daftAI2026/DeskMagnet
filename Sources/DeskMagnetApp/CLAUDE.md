@@ -2,7 +2,7 @@
 > L2 | 父级: /Users/luo/Desktop/ClaudeCode/web/DeskMagnet/Sources/CLAUDE.md
 
 成员清单
-AppDelegate.swift: AppKit 生命周期，创建 800x520 主窗口、转换 Finder 顶左坐标、关闭时自动恢复、启动未恢复状态检测
+AppDelegate.swift: AppKit 生命周期，创建固定 800x520 主窗口、转换 Finder 顶左坐标、关闭时自动恢复、启动未恢复状态检测
 ContentView.swift: SwiftUI 内容区，按规格线框图呈现“桌面清理大师”伪装 UI，不暴露吸附实现
 DeskMagnetAppMain.swift: NSApplication 入口，设置 delegate 并启动事件循环
 DeskMagnetViewModel.swift: 主窗口状态模型，调用 AppCoordinator 执行吸附、关闭恢复、跟随同步并呈现错误

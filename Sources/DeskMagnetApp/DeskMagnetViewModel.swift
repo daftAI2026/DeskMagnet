@@ -64,7 +64,7 @@ final class DeskMagnetViewModel: ObservableObject {
         case .idle:
             "不删除或重命名任何文件"
         case .working:
-            "正在临时优化 Finder 桌面布局"
+            ""
         case .attached:
             ""
         case .restoring:

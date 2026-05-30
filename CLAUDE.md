@@ -2,6 +2,9 @@
 Swift Package + Swift CLI + Finder AppleScript automation
 
 <directory>
+.github/ - GitHub Actions 自动化入口 (1子目录: workflows)
+</directory>
+<directory>
 Assets/ - 应用视觉资产 (1子目录: AppIcon)
 </directory>
 <directory>
@@ -20,6 +23,7 @@ Tests/ - Swift Testing 测试代码 (1子目录: DeskMagnetCoreTests)
 <config>
 `.gitignore` - 忽略 SwiftPM 构建产物、macOS 元数据与 Xcode 用户状态
 Package.swift - SwiftPM 包定义，暴露 DeskMagnetCore library 与 deskmagnet executable
+README.md - 用户入口文档，说明产品边界、本地构建与 GitHub runner 打包流程
 </config>
 
 架构决策:
@@ -37,5 +41,7 @@ P0 先做命令行验证器，不做 UI；Finder 真实副作用被 ShellRunning
 2026-05-30: 将图标吸附模型从窗口外下方改为窗口 X/Y 投影内，利用桌面层天然处于窗口后方的 Z 轴关系隐藏图标。
 2026-05-30: 收紧图标隐藏安全区并固定主窗口 800x520，避免标题栏、圆角边缘和缩放动作暴露桌面图标。
 2026-05-30: 将 App 外观固定为 Aqua 亮色，重塑 ContentView 为浅色工具面板，移除黑底与霓虹色状态。
+2026-05-30: 创建 README.md，记录本地构建、GitHub runner 打包与 ad-hoc signed `.app` 发布边界；打包脚本加入签名验证。
+2026-05-30: 增加 GitHub Actions 主工作流，push/PR 远端验证 SwiftPM build+test，手动或 v* tag 生成 signed app zip artifact。
 
 法则: 极简·稳定·导航·版本精确

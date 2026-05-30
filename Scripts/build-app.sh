@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+#
+# [INPUT]: 依赖 SwiftPM release 构建产物与 Assets/AppIcon/DeskMagnet.icns。
+# [OUTPUT]: 生成 ad-hoc signed build/DeskMagnet.app，并验证 bundle 签名。
+# [POS]: Scripts 的 macOS App 打包入口，供本地与 GitHub Actions runner 复用。
+# [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -43,5 +49,8 @@ cat > "$CONTENTS/Info.plist" <<'PLIST'
 </dict>
 </plist>
 PLIST
+
+codesign --force --deep --sign - "$APP_DIR"
+codesign --verify --deep --strict --verbose=2 "$APP_DIR"
 
 echo "$APP_DIR"

@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 AppKit/SwiftUI/Combine 创建 NSWindow 和主菜单，依赖 DeskMagnetCore.AppCoordinator 恢复未完成状态。
- * [OUTPUT]: 提供 AppDelegate，管理固定尺寸亮色主窗口、应用菜单、启动居中、关闭自动恢复、启动恢复提示。
+ * [OUTPUT]: 提供 AppDelegate，管理固定尺寸亮色主窗口、顶层应用/清理/语言菜单、启动居中、关闭自动恢复、启动恢复提示。
  * [POS]: DeskMagnetApp 的生命周期控制器，连接 macOS 窗口事件与 DeskMagnetViewModel。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -19,9 +19,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var cancellables: Set<AnyCancellable> = []
     private weak var appMenuItem: NSMenuItem?
     private weak var appMenu: NSMenu?
+    private weak var cleanRootMenuItem: NSMenuItem?
     private weak var cleanMenuItem: NSMenuItem?
     private weak var restoreMenuItem: NSMenuItem?
-    private weak var languageMenuItem: NSMenuItem?
+    private weak var languageRootMenuItem: NSMenuItem?
     private weak var systemLanguageMenuItem: NSMenuItem?
     private weak var quitMenuItem: NSMenuItem?
     private var languageMenuItems: [AppLanguage: NSMenuItem] = [:]
@@ -125,15 +126,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let mainMenu = NSMenu()
         let appMenuItem = NSMenuItem()
         let appMenu = NSMenu(title: "")
+        let cleanRootMenuItem = NSMenuItem()
+        let cleanMenu = NSMenu(title: "")
         let cleanMenuItem = NSMenuItem(title: "", action: #selector(cleanFromMenu), keyEquivalent: "k")
         let restoreMenuItem = NSMenuItem(title: "", action: #selector(restoreFromMenu), keyEquivalent: "r")
-        let languageMenuItem = NSMenuItem()
+        let languageRootMenuItem = NSMenuItem()
         let languageMenu = NSMenu(title: "")
         let systemLanguageMenuItem = NSMenuItem(title: "", action: #selector(selectSystemLanguageFromMenu), keyEquivalent: "")
         let quitMenuItem = NSMenuItem(title: "", action: #selector(quitFromMenu), keyEquivalent: "q")
 
         mainMenu.addItem(appMenuItem)
+        mainMenu.addItem(cleanRootMenuItem)
+        mainMenu.addItem(languageRootMenuItem)
         appMenuItem.submenu = appMenu
+        cleanRootMenuItem.submenu = cleanMenu
+        languageRootMenuItem.submenu = languageMenu
 
         cleanMenuItem.target = self
         restoreMenuItem.target = self
@@ -149,21 +156,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             languageMenu.addItem(item)
             items[language] = item
         }
-        languageMenuItem.submenu = languageMenu
-
-        appMenu.addItem(cleanMenuItem)
         appMenu.addItem(restoreMenuItem)
         appMenu.addItem(.separator())
-        appMenu.addItem(languageMenuItem)
-        appMenu.addItem(.separator())
         appMenu.addItem(quitMenuItem)
+        cleanMenu.addItem(cleanMenuItem)
 
         NSApplication.shared.mainMenu = mainMenu
         self.appMenuItem = appMenuItem
         self.appMenu = appMenu
+        self.cleanRootMenuItem = cleanRootMenuItem
         self.cleanMenuItem = cleanMenuItem
         self.restoreMenuItem = restoreMenuItem
-        self.languageMenuItem = languageMenuItem
+        self.languageRootMenuItem = languageRootMenuItem
         self.systemLanguageMenuItem = systemLanguageMenuItem
         self.quitMenuItem = quitMenuItem
         updateMenu()
@@ -188,9 +192,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let strings = languageStore.strings
         appMenuItem?.title = strings.appName
         appMenu?.title = strings.appName
+        cleanRootMenuItem?.title = strings.menuClean
         cleanMenuItem?.title = strings.menuClean
         restoreMenuItem?.title = strings.menuRestore
-        languageMenuItem?.title = strings.menuLanguage
+        languageRootMenuItem?.title = strings.menuLanguage
         systemLanguageMenuItem?.title = strings.menuFollowSystem
         quitMenuItem?.title = strings.menuQuit
         cleanMenuItem?.isEnabled = viewModel?.canClean ?? false

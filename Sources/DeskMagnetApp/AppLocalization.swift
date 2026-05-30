@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 Foundation/UserDefaults 判断系统语言并持久化用户语言选择。
- * [OUTPUT]: 提供 AppLanguage、AppStrings、AppLanguageStore，统一窗口与菜单文案。
+ * [OUTPUT]: 提供 AppLanguage、AppStrings、AppLanguageStore，统一本地化软件名、窗口与菜单文案。
  * [POS]: DeskMagnetApp 的本地化单一真相源，被 AppDelegate 与 ContentView 消费。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -109,7 +109,7 @@ struct AppStrings: Equatable {
             )
         case .traditionalChinese:
             AppStrings(
-                appName: "桌面清理大师",
+                appName: "桌面清理大師",
                 badge: "革命性創新技術，優化電腦使用體驗",
                 idleTitle: "一鍵清理，還你乾淨桌面",
                 cleanButton: "一鍵清理",
@@ -129,14 +129,14 @@ struct AppStrings: Equatable {
                 menuRestore: "還原桌面",
                 menuLanguage: "語言",
                 menuFollowSystem: "跟隨系統",
-                menuQuit: "退出桌面清理大师",
+                menuQuit: "退出桌面清理大師",
                 permissionFootnote: "需要允許 DeskMagnet 控制 Finder"
             )
         case .english:
             AppStrings(
-                appName: "桌面清理大师",
+                appName: "Desktop Cleaner Master",
                 badge: "Revolutionary cleanup tech for a smoother Mac",
-                idleTitle: "Clean in one click, keep your desktop tidy",
+                idleTitle: "Clear your desktop in one click",
                 cleanButton: "Clean Desktop",
                 cleaningTitle: "Cleaning desktop...",
                 attachedTitle: "Desktop cleaned",
@@ -154,12 +154,12 @@ struct AppStrings: Equatable {
                 menuRestore: "Restore Desktop",
                 menuLanguage: "Language",
                 menuFollowSystem: "Follow System",
-                menuQuit: "Quit 桌面清理大师",
+                menuQuit: "Quit Desktop Cleaner Master",
                 permissionFootnote: "Allow DeskMagnet to control Finder"
             )
         case .japanese:
             AppStrings(
-                appName: "桌面清理大师",
+                appName: "デスクトップ整理マスター",
                 badge: "革新的な整理技術で、Mac体験を最適化",
                 idleTitle: "ワンクリックで、デスクトップをきれいに",
                 cleanButton: "一括整理",
@@ -179,12 +179,12 @@ struct AppStrings: Equatable {
                 menuRestore: "デスクトップを復元",
                 menuLanguage: "言語",
                 menuFollowSystem: "システムに合わせる",
-                menuQuit: "桌面清理大师を終了",
+                menuQuit: "デスクトップ整理マスターを終了",
                 permissionFootnote: "DeskMagnet に Finder の制御を許可してください"
             )
         case .korean:
             AppStrings(
-                appName: "桌面清理大师",
+                appName: "데스크톱 정리 마스터",
                 badge: "혁신적인 정리 기술로 컴퓨터 사용 경험 최적화",
                 idleTitle: "한 번에 정리하고 깨끗한 데스크톱으로",
                 cleanButton: "한 번에 정리",
@@ -204,7 +204,7 @@ struct AppStrings: Equatable {
                 menuRestore: "데스크톱 복원",
                 menuLanguage: "언어",
                 menuFollowSystem: "시스템 언어 사용",
-                menuQuit: "桌面清理大师 종료",
+                menuQuit: "데스크톱 정리 마스터 종료",
                 permissionFootnote: "DeskMagnet 이 Finder 를 제어하도록 허용하세요"
             )
         }

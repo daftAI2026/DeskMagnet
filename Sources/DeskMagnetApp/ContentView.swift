@@ -84,6 +84,7 @@ private enum DeskMagnetRhythm {
     static let xl: CGFloat = 32
     static let section: CGFloat = 48
     static let canvasInset: CGFloat = 48
+    static let headerInset: CGFloat = 36
     static let bodyInset: CGFloat = 24
     static let buttonGap: CGFloat = 36
     static let contentGap: CGFloat = 10
@@ -105,7 +106,7 @@ private struct TitleSection: View {
                 Spacer()
                 StatusBadge(text: strings.badge)
             }
-            .padding(.horizontal, DeskMagnetRhythm.canvasInset)
+            .padding(.horizontal, DeskMagnetRhythm.headerInset)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             .offset(y: -proxy.safeAreaInsets.top / 2)
         }
@@ -133,7 +134,6 @@ private struct StatusBadge: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(.white.opacity(0.18))
         }
-        .frame(maxWidth: 310)
     }
 }
 

@@ -1,5 +1,7 @@
 # DeskMagnet
 
+[English](README.en.md) | 简体中文
+
 DeskMagnet 是一个 macOS Finder 桌面图标吸附工具。应用对外显示为“桌面清理大师”：点击清理后，它不删除、不重命名、不移动文件路径，只临时修改 Finder 桌面图标坐标，把桌面图标收纳到窗口投影内；关闭或恢复时再把图标和 Finder 桌面设置还原。
 
 ![桌面清理大师主界面](docs/screenshots/desk-cleaner-home.jpg)
@@ -63,3 +65,7 @@ Sources/DeskMagnetCLI/   命令行验证入口
 Tests/                   DeskMagnetCore 测试
 docs/                    产品规格与参考资料
 ```
+
+## 创意来源
+
+`docs/win版桌面清理大师参考.mp4` 是这个产品形态的创意参考视频。当前不知道原作者是谁；如果有人知道来源，欢迎提供线索或提交 PR 补充署名。

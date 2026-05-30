@@ -23,7 +23,8 @@ Tests/ - Swift Testing 测试代码 (1子目录: DeskMagnetCoreTests)
 <config>
 `.gitignore` - 忽略 SwiftPM 构建产物、macOS 元数据与 Xcode 用户状态
 Package.swift - SwiftPM 包定义，暴露 DeskMagnetCore library 与 deskmagnet executable
-README.md - 用户入口文档，说明产品边界、本地构建与 GitHub runner 打包流程
+README.md - 中文入口文档，说明产品边界、本地构建、运行方式与创意来源
+README.en.md - 英文入口文档，与 README.md 互链并说明产品边界、本地构建与创意来源
 </config>
 
 架构决策:
@@ -50,5 +51,6 @@ P0 先做命令行验证器，不做 UI；Finder 真实副作用被 ShellRunning
 2026-05-30: 调整顶栏内容按绿色区域垂直居中，主体文案使用轻字重并扩大按钮间距。
 2026-05-30: 将 bundle 展示名改为“桌面清理大师”，并禁用窗口位置恢复以保证每次启动居中。
 2026-05-30: 补齐 macOS 应用菜单，一键清理/还原/退出接入现有动作，并加入中繁英日韩语言切换。
+2026-05-31: 将软件名纳入本地化，拆出顶层清理/语言菜单，新增英文 README 并补充创意来源说明。
 
 法则: 极简·稳定·导航·版本精确

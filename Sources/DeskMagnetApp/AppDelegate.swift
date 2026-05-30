@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 AppKit/SwiftUI 创建 NSWindow，依赖 DeskMagnetCore.AppCoordinator 恢复未完成状态。
- * [OUTPUT]: 提供 AppDelegate，管理固定尺寸主窗口、关闭自动恢复、启动恢复提示。
+ * [OUTPUT]: 提供 AppDelegate，管理固定尺寸亮色主窗口、关闭自动恢复、启动恢复提示。
  * [POS]: DeskMagnetApp 的生命周期控制器，连接 macOS 窗口事件与 DeskMagnetViewModel。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -17,6 +17,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var closingAfterRestore = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApplication.shared.appearance = NSAppearance(named: .aqua)
         do {
             let store = try RecoveryStore.live()
             let converter = NSScreen.deskMagnetCoordinateConverter
@@ -33,6 +34,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             window.title = "桌面清理大师"
             window.minSize = windowSize
             window.maxSize = windowSize
+            window.appearance = NSAppearance(named: .aqua)
+            window.backgroundColor = .controlBackgroundColor
             window.contentView = NSHostingView(rootView: content)
             window.center()
             window.delegate = self

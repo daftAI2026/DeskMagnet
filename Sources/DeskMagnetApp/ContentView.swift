@@ -1,7 +1,7 @@
 /**
  * [INPUT]: 依赖 SwiftUI 与 DeskMagnetViewModel 的 Phase 状态。
- * [OUTPUT]: 提供 DeskMagnet 主窗口内容视图。
- * [POS]: DeskMagnetApp 的 UI 表层，只渲染状态和动作，不直接操作 Finder。
+ * [OUTPUT]: 提供亮色 DeskMagnet 主窗口内容视图。
+ * [POS]: DeskMagnetApp 的 UI 表层，统一视觉状态和动作入口，不直接操作 Finder。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
@@ -13,33 +13,43 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 0) {
             TitleSection()
-            Divider().background(Color.white.opacity(0.12))
-            Spacer(minLength: 18)
-            StatusSection(phase: viewModel.phase)
-            ProgressSection(phase: viewModel.phase)
-            if viewModel.showsPrimaryButton {
-                Button(action: viewModel.primaryAction) {
-                    Text(viewModel.primaryButtonTitle)
-                        .font(.system(size: 26, weight: .bold))
-                        .frame(width: 280, height: 56)
+            Divider()
+                .overlay(DeskMagnetPalette.divider)
+            VStack(spacing: 22) {
+                StatusSection(phase: viewModel.phase)
+                ProgressSection(phase: viewModel.phase)
+                if viewModel.showsPrimaryButton {
+                    Button(action: viewModel.primaryAction) {
+                        Text(viewModel.primaryButtonTitle)
+                            .font(.system(size: 20, weight: .semibold))
+                            .frame(width: 224, height: 46)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .tint(DeskMagnetPalette.action)
+                    .disabled(isBusy)
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .disabled(isBusy)
+                FootnoteSection(text: viewModel.footnote)
+                    .frame(height: 50)
             }
-            Spacer(minLength: 14)
-            if !viewModel.footnote.isEmpty {
-                Text(viewModel.footnote)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(.gray)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 16)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.horizontal, 48)
+            .padding(.vertical, 30)
+            .background {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(DeskMagnetPalette.panel)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(DeskMagnetPalette.panelBorder, lineWidth: 1)
+                    }
+                    .shadow(color: .black.opacity(0.06), radius: 18, x: 0, y: 8)
+                    .padding(.horizontal, 36)
+                    .padding(.vertical, 24)
             }
         }
         .frame(minWidth: 720, minHeight: 440)
-        .background(Color(red: 0.05, green: 0.05, blue: 0.06))
+        .background(DeskMagnetPalette.window)
+        .preferredColorScheme(.light)
     }
 
     private var isBusy: Bool {
@@ -52,14 +62,60 @@ struct ContentView: View {
     }
 }
 
+private enum DeskMagnetPalette {
+    static let action = Color(red: 0.08, green: 0.36, blue: 0.92)
+    static let attention = Color(red: 0.00, green: 0.48, blue: 0.50)
+    static let danger = Color(red: 0.76, green: 0.15, blue: 0.16)
+    static let divider = Color.black.opacity(0.08)
+    static let panel = Color(nsColor: .textBackgroundColor)
+    static let panelBorder = Color.black.opacity(0.07)
+    static let success = Color(red: 0.13, green: 0.48, blue: 0.28)
+    static let window = Color(red: 0.95, green: 0.96, blue: 0.97)
+}
+
 private struct TitleSection: View {
     var body: some View {
-        Text("桌面清理大师")
-            .font(.system(size: 40, weight: .bold))
-            .foregroundStyle(.cyan)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 44)
-            .padding(.vertical, 36)
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(DeskMagnetPalette.action.opacity(0.10))
+                Image(systemName: "sparkles.rectangle.stack")
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundStyle(DeskMagnetPalette.action)
+            }
+            .frame(width: 44, height: 44)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text("桌面清理大师")
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundStyle(.primary)
+                Text("整理完成后，移动这个窗口即可保持遮挡位置")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            StatusBadge()
+        }
+        .padding(.horizontal, 34)
+        .padding(.vertical, 24)
+    }
+}
+
+private struct StatusBadge: View {
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "checkmark.shield.fill")
+                .font(.system(size: 13, weight: .semibold))
+            Text("不改动文件")
+                .font(.system(size: 13, weight: .semibold))
+        }
+        .foregroundStyle(DeskMagnetPalette.success)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(DeskMagnetPalette.success.opacity(0.10))
+        }
     }
 }
 
@@ -67,64 +123,74 @@ private struct StatusSection: View {
     let phase: DeskMagnetViewModel.Phase
 
     var body: some View {
-        VStack(spacing: 8) {
-            Text(title)
-                .font(.system(size: 36, weight: .bold))
-                .foregroundStyle(color)
+        VStack(spacing: 12) {
+            Image(systemName: presentation.symbolName)
+                .font(.system(size: 44, weight: .semibold))
+                .foregroundStyle(presentation.color)
+                .frame(height: 52)
+            Text(presentation.title)
+                .font(.system(size: 34, weight: .bold))
+                .foregroundStyle(presentation.color)
                 .multilineTextAlignment(.center)
-                .lineLimit(3)
+                .lineLimit(2)
                 .padding(.horizontal, 24)
-            if !subtitle.isEmpty {
-                Text(subtitle)
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.72))
+            if !presentation.subtitle.isEmpty {
+                Text(presentation.subtitle)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .lineLimit(3)
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, 34)
             }
         }
     }
 
-    private var title: String {
+    private var presentation: PhasePresentation {
         switch phase {
         case .idle:
-            "一键清理桌面"
+            PhasePresentation(
+                title: "一键清理桌面",
+                subtitle: "窗口保持在桌面前方，图标会被收纳到窗口背后。",
+                symbolName: "rectangle.stack.badge.plus",
+                color: DeskMagnetPalette.action
+            )
         case let .working(text, _):
-            text
-        case .attached:
-            "桌面已整理完毕！"
-        case .restoring:
-            "正在恢复桌面..."
-        case .failed:
-            "清理失败"
-        }
-    }
-
-    private var subtitle: String {
-        switch phase {
-        case .idle:
-            ""
-        case .working:
-            ""
+            PhasePresentation(
+                title: text,
+                subtitle: "",
+                symbolName: "wand.and.stars",
+                color: DeskMagnetPalette.action
+            )
         case let .attached(count):
-            "已整理 \(count) 个图标"
+            PhasePresentation(
+                title: "桌面已整理完毕",
+                subtitle: "已整理 \(count) 个图标",
+                symbolName: "checkmark.circle.fill",
+                color: DeskMagnetPalette.success
+            )
         case .restoring:
-            "图标和 Finder 设置会回到启动前"
+            PhasePresentation(
+                title: "正在恢复桌面",
+                subtitle: "图标和 Finder 设置会回到启动前",
+                symbolName: "arrow.counterclockwise.circle",
+                color: DeskMagnetPalette.attention
+            )
         case let .failed(message):
-            message
+            PhasePresentation(
+                title: "清理失败",
+                subtitle: message,
+                symbolName: "exclamationmark.triangle.fill",
+                color: DeskMagnetPalette.danger
+            )
         }
     }
+}
 
-    private var color: Color {
-        switch phase {
-        case .attached:
-            .green
-        case .failed:
-            .red
-        default:
-            .white
-        }
-    }
+private struct PhasePresentation {
+    let title: String
+    let subtitle: String
+    let symbolName: String
+    let color: Color
 }
 
 private struct ProgressSection: View {
@@ -134,15 +200,38 @@ private struct ProgressSection: View {
         Group {
             if case let .working(_, progress) = phase {
                 ProgressView(value: progress)
-                    .tint(.cyan)
-                    .frame(width: 190)
+                    .tint(DeskMagnetPalette.action)
+                    .frame(width: 210)
             } else if case .restoring = phase {
                 ProgressView()
                     .controlSize(.small)
-                    .tint(.green)
+                    .tint(DeskMagnetPalette.attention)
             }
         }
-        .frame(height: 30)
-        .padding(.vertical, 8)
+        .frame(height: 28)
+    }
+}
+
+private struct FootnoteSection: View {
+    let text: String
+
+    var body: some View {
+        Group {
+            if text.isEmpty {
+                Color.clear
+            } else {
+                Text(text)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 10)
+                    .background {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .fill(Color.black.opacity(0.035))
+                    }
+            }
+        }
     }
 }

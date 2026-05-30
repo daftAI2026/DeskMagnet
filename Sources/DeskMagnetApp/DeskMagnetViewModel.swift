@@ -51,7 +51,7 @@ final class DeskMagnetViewModel: ObservableObject {
 
     var showsPrimaryButton: Bool {
         switch phase {
-        case .attached:
+        case .attached, .working, .restoring:
             false
         default:
             true
@@ -62,13 +62,13 @@ final class DeskMagnetViewModel: ObservableObject {
         if let detailNote { return detailNote }
         return switch phase {
         case .idle:
-            "不删除或重命名任何文件"
+            ""
         case .working:
             ""
         case .attached:
             ""
         case .restoring:
-            "正在恢复 Finder 桌面设置"
+            ""
         case .failed:
             "需要允许 DeskMagnet 控制 Finder"
         }

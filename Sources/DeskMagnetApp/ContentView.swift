@@ -95,7 +95,16 @@ private struct ContentPanel: View {
         case .attached:
             false
         default:
-            showsPrimaryButton || isBusy
+            showsPrimaryButton || hasProgress
+        }
+    }
+
+    private var hasProgress: Bool {
+        switch phase {
+        case .working, .restoring:
+            true
+        default:
+            false
         }
     }
 }
@@ -124,15 +133,6 @@ private enum DeskMagnetRhythm {
 private struct TitleSection: View {
     var body: some View {
         HStack(spacing: DeskMagnetRhythm.md) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(DeskMagnetPalette.action.opacity(0.10))
-                Image(systemName: "sparkles.rectangle.stack")
-                    .font(.system(size: 22, weight: .medium))
-                    .foregroundStyle(DeskMagnetPalette.action)
-            }
-            .frame(width: 44, height: 44)
-
             Text("桌面清理大师")
                 .font(.system(size: 28, weight: .semibold))
                 .foregroundStyle(.primary)
@@ -149,7 +149,7 @@ private struct StatusBadge: View {
         HStack(spacing: 6) {
             Image(systemName: "checkmark.shield.fill")
                 .font(.system(size: 13, weight: .semibold))
-            Text("不改动文件")
+            Text("专业桌面整理解决方案")
                 .font(.system(size: 13, weight: .medium))
         }
         .foregroundStyle(DeskMagnetPalette.success)
@@ -172,7 +172,7 @@ private struct StatusSection: View {
                 .foregroundStyle(presentation.color)
                 .frame(width: 56, height: 56)
             Text(presentation.title)
-                .font(.system(size: 33, weight: .medium, design: .serif))
+                .font(.system(size: 33, weight: .medium))
                 .foregroundStyle(presentation.color)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
@@ -194,8 +194,8 @@ private struct StatusSection: View {
         switch phase {
         case .idle:
             PhasePresentation(
-                title: "一键清理桌面",
-                subtitle: "窗口保持在桌面前方，图标会被收纳到窗口背后。",
+                title: "一键清理，还你整洁桌面",
+                subtitle: "",
                 symbolName: "rectangle.stack.badge.plus",
                 color: DeskMagnetPalette.action
             )
@@ -258,9 +258,6 @@ private struct ActionSection: View {
                 .controlSize(.large)
                 .tint(DeskMagnetPalette.action)
                 .disabled(isBusy)
-            } else {
-                Color.clear
-                    .frame(width: 224, height: 46)
             }
         }
         .frame(maxWidth: .infinity, alignment: .center)

@@ -32,6 +32,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 defer: false
             )
             window.title = "桌面清理大师"
+            window.titleVisibility = .hidden
             window.minSize = windowSize
             window.maxSize = windowSize
             window.appearance = NSAppearance(named: .aqua)

@@ -24,8 +24,8 @@ struct ContentView: View {
                 primaryAction: viewModel.primaryAction
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.horizontal, DeskMagnetRhythm.section)
-            .padding(.vertical, DeskMagnetRhythm.lg)
+            .padding(.horizontal, DeskMagnetRhythm.canvasInset)
+            .padding(.vertical, DeskMagnetRhythm.canvasInset)
         }
         .frame(minWidth: 720, minHeight: 440)
         .background(DeskMagnetPalette.window)
@@ -128,6 +128,7 @@ private enum DeskMagnetRhythm {
     static let lg: CGFloat = 24
     static let xl: CGFloat = 32
     static let section: CGFloat = 48
+    static let canvasInset: CGFloat = 48
 }
 
 private struct TitleSection: View {
@@ -139,7 +140,7 @@ private struct TitleSection: View {
             Spacer()
             StatusBadge()
         }
-        .padding(.horizontal, DeskMagnetRhythm.xl)
+        .padding(.horizontal, DeskMagnetRhythm.canvasInset)
         .padding(.vertical, DeskMagnetRhythm.lg)
     }
 }

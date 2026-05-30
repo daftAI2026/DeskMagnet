@@ -8,7 +8,7 @@ Swift Package + Swift CLI + Finder AppleScript automation
 Assets/ - 应用视觉资产 (1子目录: AppIcon)
 </directory>
 <directory>
-docs/ - 产品规格与参考素材 (1子目录: reference)
+docs/ - 产品规格、参考素材与展示截图 (2子目录: reference, screenshots)
 </directory>
 <directory>
 Scripts/ - 构建脚本 (1文件: build-app.sh)
@@ -43,5 +43,6 @@ P0 先做命令行验证器，不做 UI；Finder 真实副作用被 ShellRunning
 2026-05-30: 将 App 外观固定为 Aqua 亮色，重塑 ContentView 为浅色工具面板，移除黑底与霓虹色状态。
 2026-05-30: 创建 README.md，记录本地构建、GitHub runner 打包与 ad-hoc signed `.app` 发布边界；打包脚本加入签名验证。
 2026-05-30: 增加 GitHub Actions 主工作流，push/PR 远端验证 SwiftPM build+test，手动或 v* tag 生成 signed app zip artifact。
+2026-05-30: 统一主界面外部 padding，隐藏原生标题栏文字，并将本地 App 截图加入 README 展示。
 
 法则: 极简·稳定·导航·版本精确

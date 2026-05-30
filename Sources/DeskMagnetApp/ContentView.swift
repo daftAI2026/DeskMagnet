@@ -51,7 +51,7 @@ private struct ContentPanel: View {
     let primaryAction: () -> Void
 
     var body: some View {
-        VStack(spacing: DeskMagnetRhythm.lg) {
+        VStack(spacing: DeskMagnetRhythm.contentGap) {
             StatusSection(phase: phase)
                 .frame(maxWidth: .infinity, alignment: .center)
             ActionSection(
@@ -66,6 +66,8 @@ private struct ContentPanel: View {
         }
         .padding(.horizontal, DeskMagnetRhythm.section)
         .padding(.vertical, DeskMagnetRhythm.lg)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .offset(y: -DeskMagnetRhythm.bodyLift)
     }
 }
 
@@ -86,6 +88,8 @@ private enum DeskMagnetRhythm {
     static let section: CGFloat = 48
     static let canvasInset: CGFloat = 48
     static let bodyInset: CGFloat = 24
+    static let bodyLift: CGFloat = 22
+    static let contentGap: CGFloat = 10
     static let titleHeight: CGFloat = 128
 }
 

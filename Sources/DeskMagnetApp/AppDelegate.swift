@@ -27,12 +27,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             let windowSize = NSSize(width: 800, height: 520)
             let window = NSWindow(
                 contentRect: NSRect(origin: .zero, size: windowSize),
-                styleMask: [.titled, .closable, .miniaturizable],
+                styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
                 backing: .buffered,
                 defer: false
             )
             window.title = "桌面清理大师"
             window.titleVisibility = .hidden
+            window.titlebarAppearsTransparent = true
             window.minSize = windowSize
             window.maxSize = windowSize
             window.appearance = NSAppearance(named: .aqua)

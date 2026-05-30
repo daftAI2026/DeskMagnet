@@ -45,5 +45,6 @@ P0 先做命令行验证器，不做 UI；Finder 真实副作用被 ShellRunning
 2026-05-30: 增加 GitHub Actions 主工作流，push/PR 远端验证 SwiftPM build+test，手动或 v* tag 生成 signed app zip artifact。
 2026-05-30: 统一主界面外部 padding，隐藏原生标题栏文字，并将本地 App 截图加入 README 展示。
 2026-05-30: 将 UI 主色收敛为单一绿色，顶栏与主体按 1:3 分区，主体区域去除内框打通。
+2026-05-30: 采用 full-size content window，让系统三按钮落入绿色顶栏，移除原生白色 titlebar。
 
 法则: 极简·稳定·导航·版本精确

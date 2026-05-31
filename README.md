@@ -93,3 +93,7 @@ docs/                    产品规格与参考资料
 ## 创意来源
 
 `docs/win版桌面清理大师参考.mp4` 是这个产品形态的创意参考视频。当前不知道原作者是谁；如果有人知道来源，欢迎提供线索或提交 PR 补充署名。
+
+## License
+
+DeskMagnet 使用 [MIT License](LICENSE)。

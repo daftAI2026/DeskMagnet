@@ -22,6 +22,7 @@ Tests/ - Swift Testing 测试代码 (1子目录: DeskMagnetCoreTests)
 
 <config>
 `.gitignore` - 忽略 SwiftPM 构建产物、macOS 元数据与 Xcode 用户状态
+LICENSE - MIT 开源协议，定义使用、复制、修改、分发与免责声明
 Package.swift - SwiftPM 包定义，暴露 DeskMagnetCore library 与 deskmagnet executable
 README.md - 中文入口文档，说明产品边界、菜单语言、本地构建、Runner 打包、限制与创意来源
 README.en.md - 英文入口文档，与 README.md 互链并说明产品边界、菜单语言、本地构建、Runner 打包、限制与创意来源
@@ -53,5 +54,6 @@ P0 先做命令行验证器，不做 UI；Finder 真实副作用被 ShellRunning
 2026-05-30: 补齐 macOS 应用菜单，一键清理/还原/退出接入现有动作，并加入中繁英日韩语言切换。
 2026-05-31: 将软件名纳入本地化，拆出顶层清理/语言菜单，新增英文 README 并补充创意来源说明。
 2026-05-31: README 补齐 Runner 打包、权限、菜单语言与已知限制；Finder 后台重启并在清理后恢复 App 焦点。
+2026-05-31: 增加 MIT License，并在中英文 README 中补充协议入口。
 
 法则: 极简·稳定·导航·版本精确

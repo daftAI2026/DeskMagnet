@@ -93,3 +93,7 @@ docs/                    Product spec and reference materials
 ## Inspiration
 
 `docs/win版桌面清理大师参考.mp4` is the creative reference video for this product shape. The original author is currently unknown. If you know the source, please provide a lead or open a PR to add attribution.
+
+## License
+
+DeskMagnet is released under the [MIT License](LICENSE).

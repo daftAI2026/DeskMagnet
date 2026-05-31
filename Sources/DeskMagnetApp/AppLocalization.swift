@@ -138,7 +138,7 @@ struct AppStrings: Equatable {
         case .english:
             AppStrings(
                 appName: "Desktop Cleanup Master",
-                badge: "Revolutionary innovation technology, optimized for your computer experience",
+                badge: "Revolutionary tech for a better Mac",
                 idleTitle: "One-click cleanup for a clean desktop",
                 cleanButton: "Clean Desktop",
                 cleaningTitle: "Cleaning desktop...",

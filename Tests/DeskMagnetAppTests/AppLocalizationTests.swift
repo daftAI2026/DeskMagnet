@@ -17,12 +17,17 @@ struct AppLocalizationTests {
         #expect(AppStrings.values(for: .traditionalChinese).badge == "革命性創新技術，優化電腦使用體驗")
         #expect(AppStrings.values(for: .traditionalChinese).idleTitle == "一鍵清理，還你乾淨桌面")
         #expect(AppStrings.values(for: .english).appName == "Desktop Cleanup Master")
-        #expect(AppStrings.values(for: .english).badge == "Revolutionary innovation technology, optimized for your computer experience")
+        #expect(AppStrings.values(for: .english).badge == "Revolutionary tech for a better Mac")
         #expect(AppStrings.values(for: .english).idleTitle == "One-click cleanup for a clean desktop")
         #expect(AppStrings.values(for: .japanese).badge == "革命的な革新技術で、コンピュータ体験を最適化")
         #expect(AppStrings.values(for: .japanese).idleTitle == "ワンクリックで、きれいなデスクトップに")
         #expect(AppStrings.values(for: .korean).badge == "혁명적인 혁신 기술로 컴퓨터 사용 경험을 최적화")
         #expect(AppStrings.values(for: .korean).idleTitle == "한 번의 클릭으로 깨끗한 데스크톱을 돌려드립니다")
+    }
+
+    @Test("English badge is short enough for the title bar")
+    func englishBadgeFitsTitleBar() {
+        #expect(AppStrings.values(for: .english).badge.count <= 40)
     }
 
     @Test("Attached title uses natural product wording")

@@ -1,5 +1,5 @@
 /**
- * [INPUT]: 依赖 ShellRunning 执行 osascript，依赖 FinderIconScript 生成读取与批量移动脚本。
+ * [INPUT]: 依赖 ShellRunning 执行 osascript，依赖 FinderIconScript 生成 JSON 读取与路径移动脚本。
  * [OUTPUT]: 对外提供 FinderIconController.readDesktopItems()、moveItems(_:)、validatePositions(_:)。
  * [POS]: DeskMagnetCore 的桌面图标控制器，负责 Finder item 坐标 I/O 与可移动性判断。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
@@ -9,6 +9,13 @@ import Foundation
 
 public final class FinderIconController: Sendable {
     private let shell: ShellRunning
+
+    private struct FinderItemLine: Decodable {
+        let name: String
+        let path: String
+        let x: Int
+        let y: Int
+    }
 
     public init(shell: ShellRunning = ProcessShellRunner()) {
         self.shell = shell
@@ -31,10 +38,11 @@ public final class FinderIconController: Sendable {
     }
 
     private func parseItemLine(_ line: Substring) throws -> DesktopItem {
-        let fields = line.split(separator: "\t", omittingEmptySubsequences: false)
-        guard fields.count == 4, let x = Int(fields[2]), let y = Int(fields[3]) else {
+        guard let data = String(line).data(using: .utf8),
+              let item = try? JSONDecoder().decode(FinderItemLine.self, from: data)
+        else {
             throw DeskMagnetError.malformedDesktopItemLine(String(line))
         }
-        return DesktopItem(name: String(fields[0]), path: String(fields[1]), position: Point(x: x, y: y))
+        return DesktopItem(name: item.name, path: item.path, position: Point(x: item.x, y: item.y))
     }
 }

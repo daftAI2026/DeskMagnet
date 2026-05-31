@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 AppKit/SwiftUI/Combine 创建 NSWindow 和主菜单，依赖 DeskMagnetCore.AppCoordinator 恢复未完成状态。
- * [OUTPUT]: 提供 AppDelegate，管理固定尺寸亮色主窗口、顶层应用/清理/语言菜单、启动居中、清理后焦点恢复、关闭自动恢复、启动恢复提示。
+ * [OUTPUT]: 提供 AppDelegate，管理固定尺寸亮色主窗口、顶层应用/清理/语言菜单、启动居中、清理后焦点恢复、关闭自动恢复、重复退出防挂起、启动恢复提示。
  * [POS]: DeskMagnetApp 的生命周期控制器，连接 macOS 窗口事件与 DeskMagnetViewModel。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -83,7 +83,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard let viewModel, viewModel.isAttached else { return .terminateNow }
-        guard !closingAfterRestore else { return .terminateLater }
+        guard !closingAfterRestore else { return .terminateCancel }
         closingAfterRestore = true
         Task { @MainActor in
             let restored = await viewModel.restoreForTermination()

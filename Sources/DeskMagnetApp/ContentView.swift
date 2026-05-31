@@ -152,6 +152,7 @@ private struct StatusSection: View {
                 .foregroundStyle(presentation.color)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
+                .minimumScaleFactor(0.62)
                 .lineSpacing(2)
                 .padding(.horizontal, DeskMagnetRhythm.lg)
             if !presentation.subtitle.isEmpty {

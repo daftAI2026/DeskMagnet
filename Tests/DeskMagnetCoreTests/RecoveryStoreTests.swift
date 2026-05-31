@@ -59,4 +59,29 @@ extension RecoveryState {
             ]
         )
     }
+
+    static func fixtureWithTwoItems(snapshotPath: String) -> RecoveryState {
+        RecoveryState(
+            schemaVersion: 1,
+            status: .attached,
+            createdAt: Date(timeIntervalSince1970: 1_780_000_000),
+            finderSnapshotPath: snapshotPath,
+            items: [
+                RecoveryItem(
+                    name: "A.txt",
+                    path: "/Users/me/Desktop/A.txt",
+                    originalPosition: Point(x: 100, y: 120),
+                    attachedOffset: Offset(dx: 20, dy: 244),
+                    lastKnownPosition: Point(x: 220, y: 344)
+                ),
+                RecoveryItem(
+                    name: "B.txt",
+                    path: "/Users/me/Desktop/B.txt",
+                    originalPosition: Point(x: 180, y: 120),
+                    attachedOffset: Offset(dx: 108, dy: 244),
+                    lastKnownPosition: Point(x: 308, y: 344)
+                )
+            ]
+        )
+    }
 }

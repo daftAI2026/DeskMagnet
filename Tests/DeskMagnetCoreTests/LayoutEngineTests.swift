@@ -75,7 +75,7 @@ struct LayoutEngineTests {
 
         let moves = engine.moves(for: state, windowFrame: WindowFrame(x: 100, y: 80, width: 800, height: 520))
 
-        #expect(moves == [IconMove(name: "A.txt", position: Point(x: 244, y: 192))])
+        #expect(moves == [IconMove(name: "A.txt", path: "/Users/me/Desktop/A.txt", position: Point(x: 244, y: 192))])
     }
 
     @Test("Applies deterministic jitter without moving icons outside the active screen")

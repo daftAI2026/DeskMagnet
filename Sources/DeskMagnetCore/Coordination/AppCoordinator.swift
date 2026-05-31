@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 FinderSettingsManaging、FinderIconControlling、RecoveryStore、LayoutEngine 串联真实桌面吸附流程。
- * [OUTPUT]: 对外提供 AppCoordinator.attach、restore、syncAttachedIcons、unfinishedState。
+ * [OUTPUT]: 对外提供 AppCoordinator.attach、restore、syncAttachedIcons、unfinishedState、unfinishedStateStatus。
  * [POS]: DeskMagnetCore 的 P1 应用编排层，被 SwiftUI/AppKit 外壳调用。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -40,6 +40,15 @@ public final class AppCoordinator: Sendable {
 
     public func unfinishedState() throws -> RecoveryState? {
         try store.load()
+    }
+
+    public func unfinishedStateStatus() -> RecoveryStateStatus {
+        do {
+            guard let state = try store.load() else { return .none }
+            return .attached(state)
+        } catch {
+            return .unreadable("\(store.stateURL.path): \(error)")
+        }
     }
 
     public func attach(windowFrame: WindowFrame) async throws -> RecoveryState {
@@ -87,22 +96,30 @@ public final class AppCoordinator: Sendable {
             return RestoreResult(restoredCount: 0, skippedCount: 0)
         }
 
-        var moveError: Error?
-        do {
-            try await icons.moveItems(layout.restoreMoves(for: state))
-        } catch {
-            moveError = error
+        var firstMoveError: Error?
+        var restoredItems: [String] = []
+        var skippedItems: [String] = []
+        for move in layout.restoreMoves(for: state) {
+            do {
+                try await icons.moveItems([move])
+                restoredItems.append(move.name)
+            } catch {
+                if firstMoveError == nil { firstMoveError = error }
+                skippedItems.append(move.name)
+            }
         }
 
         try await settings.restoreFinderSettings(snapshotURL: URL(fileURLWithPath: state.finderSnapshotPath))
-        if let moveError { throw moveError }
+        if restoredItems.isEmpty, !state.items.isEmpty, let firstMoveError {
+            throw firstMoveError
+        }
 
         try store.clear()
         return RestoreResult(
-            restoredCount: state.items.count,
-            skippedCount: 0,
-            restoredItems: state.items.map(\.name),
-            skippedItems: [],
+            restoredCount: restoredItems.count,
+            skippedCount: skippedItems.count,
+            restoredItems: restoredItems,
+            skippedItems: skippedItems,
             finderSnapshotPath: state.finderSnapshotPath
         )
     }

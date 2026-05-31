@@ -4,7 +4,7 @@ English | [简体中文](README.md)
 
 DeskMagnet is a macOS Finder desktop icon magnet. The app name is localized for users. When you clean the desktop, it does not delete, rename, or move files on disk. It only changes Finder desktop icon coordinates temporarily, places the icons behind the app window, and restores the icons plus Finder desktop settings when you quit or restore.
 
-![Desktop Cleaner Master main window](docs/screenshots/desk-cleaner-home.jpg)
+![Desktop Cleanup Master main window](docs/screenshots/desk-cleaner-home.jpg)
 
 This project currently supports macOS only. The core behavior depends on Finder AppleScript, the macOS desktop coordinate system, and an `.app` bundle. Windows and Linux are not supported.
 
@@ -40,7 +40,7 @@ Scripts/build-app.sh
 The built app is located at:
 
 ```text
-build/DeskMagnet.app
+build/桌面清理大师.app
 ```
 
 `Scripts/build-app.sh` runs the release build, assembles the `.app`, writes `Info.plist`, copies the `.icns`, and validates the ad-hoc signature. It is the only app packaging entry point used by local builds and CI.
@@ -48,14 +48,14 @@ build/DeskMagnet.app
 ## Local Run
 
 ```bash
-open build/DeskMagnet.app
+open "build/桌面清理大师.app"
 ```
 
 If macOS adds a quarantine flag after downloading a browser or GitHub artifact build:
 
 ```bash
-xattr -dr com.apple.quarantine build/DeskMagnet.app
-open build/DeskMagnet.app
+xattr -dr com.apple.quarantine "build/桌面清理大师.app"
+open "build/桌面清理大师.app"
 ```
 
 The current artifact is an ad-hoc signed `.app`, not an Apple Developer ID signed or notarized build. Public distribution still needs a Developer ID certificate, hardened runtime, `notarytool`, and stapler validation.
@@ -69,7 +69,7 @@ Only two paths create an `.app.zip` artifact:
 - Run the workflow manually with `workflow_dispatch`.
 - Push a `v*` tag, for example `v0.1.0`.
 
-The packaging job uploads a `DeskMagnet-macOS` artifact containing `DeskMagnet.app.zip`. CI and local builds share `Scripts/build-app.sh`, so a local packaging pass should match the Runner behavior.
+The packaging job uploads a `桌面清理大师-macOS` artifact containing `桌面清理大师.app.zip`. CI and local builds share `Scripts/build-app.sh`, so a local packaging pass should match the Runner behavior.
 
 ## Known Limitations
 

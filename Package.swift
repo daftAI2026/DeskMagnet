@@ -36,6 +36,11 @@ let package = Package(
             name: "DeskMagnetCoreTests",
             dependencies: ["DeskMagnetCore"],
             exclude: ["CLAUDE.md"]
+        ),
+        .testTarget(
+            name: "DeskMagnetAppTests",
+            dependencies: ["DeskMagnetApp"],
+            exclude: ["CLAUDE.md"]
         )
     ]
 )

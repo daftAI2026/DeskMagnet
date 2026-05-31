@@ -45,8 +45,8 @@ public final class P0Workflow: Sendable {
             guard FinderIconController.validatePositions(items) else { throw DeskMagnetError.unreadableDesktopPositions }
             let item = try firstMovableItem(in: items)
             let moved = Point(x: item.position.x + 96, y: item.position.y)
-            try await icons.moveItems([IconMove(name: item.name, position: moved)])
-            try await icons.moveItems([IconMove(name: item.name, position: item.position)])
+            try await icons.moveItems([IconMove(name: item.name, path: item.path, position: moved)])
+            try await icons.moveItems([IconMove(name: item.name, path: item.path, position: item.position)])
             try await settings.restoreFinderSettings(snapshotURL: context.snapshotURL)
             return P0Snapshot(item: item, movedPosition: moved, createdAt: Date())
         } catch {

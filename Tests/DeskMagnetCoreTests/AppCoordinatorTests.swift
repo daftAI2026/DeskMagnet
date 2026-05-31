@@ -47,7 +47,27 @@ struct AppCoordinatorTests {
         #expect(result.restoredCount == 1)
         #expect(result.restoredItems == ["A.txt"])
         #expect(result.finderSnapshotPath == store.finderSnapshotURL.path)
-        #expect(icons.moveBatches == [[IconMove(name: "A.txt", position: Point(x: 100, y: 120))]])
+        #expect(icons.moveBatches == [[IconMove(name: "A.txt", path: "/Users/me/Desktop/A.txt", position: Point(x: 100, y: 120))]])
+        #expect(settings.restoredSnapshotURL == store.finderSnapshotURL)
+        #expect(try store.load() == nil)
+    }
+
+    @Test("Restore skips missing icons and still clears recovered state")
+    func restoreSkipsMissingItems() async throws {
+        let directory = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("DeskMagnetRestoreSkipTests-\(UUID().uuidString)", isDirectory: true)
+        let store = RecoveryStore(directory: directory)
+        try store.save(.fixtureWithTwoItems(snapshotPath: store.finderSnapshotURL.path))
+        let settings = RecordingSettingsManager()
+        let icons = RecordingIconController(stateURL: store.stateURL, items: [], failingMoveNames: ["B.txt"])
+        let coordinator = AppCoordinator(settings: settings, icons: icons, store: store, layout: LayoutEngine())
+
+        let result = try await coordinator.restore()
+
+        #expect(result.restoredCount == 1)
+        #expect(result.skippedCount == 1)
+        #expect(result.restoredItems == ["A.txt"])
+        #expect(result.skippedItems == ["B.txt"])
         #expect(settings.restoredSnapshotURL == store.finderSnapshotURL)
         #expect(try store.load() == nil)
     }
@@ -67,6 +87,27 @@ struct AppCoordinatorTests {
 
         #expect(try coordinator.unfinishedState()?.status == .attached)
     }
+
+    @Test("Reports corrupt recovery state instead of treating it as absent")
+    func reportsCorruptRecoveryState() throws {
+        let directory = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("DeskMagnetCorruptStateTests-\(UUID().uuidString)", isDirectory: true)
+        let store = RecoveryStore(directory: directory)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try Data("not json".utf8).write(to: store.stateURL)
+        let coordinator = AppCoordinator(
+            settings: RecordingSettingsManager(),
+            icons: RecordingIconController(stateURL: store.stateURL, items: []),
+            store: store,
+            layout: LayoutEngine()
+        )
+
+        guard case let .unreadable(message) = coordinator.unfinishedStateStatus() else {
+            Issue.record("Expected unreadable recovery state")
+            return
+        }
+        #expect(message.contains("state.json"))
+    }
 }
 
 private final class RecordingSettingsManager: FinderSettingsManaging, @unchecked Sendable {
@@ -85,12 +126,14 @@ private final class RecordingSettingsManager: FinderSettingsManaging, @unchecked
 private final class RecordingIconController: FinderIconControlling, @unchecked Sendable {
     let stateURL: URL
     let items: [DesktopItem]
+    let failingMoveNames: Set<String>
     var moveBatches: [[IconMove]] = []
     var moveObservedStateFileBeforeFirstMove = false
 
-    init(stateURL: URL, items: [DesktopItem]) {
+    init(stateURL: URL, items: [DesktopItem], failingMoveNames: Set<String> = []) {
         self.stateURL = stateURL
         self.items = items
+        self.failingMoveNames = failingMoveNames
     }
 
     func readDesktopItems() async throws -> [DesktopItem] {
@@ -100,6 +143,9 @@ private final class RecordingIconController: FinderIconControlling, @unchecked S
     func moveItems(_ moves: [IconMove]) async throws {
         if moveBatches.isEmpty {
             moveObservedStateFileBeforeFirstMove = FileManager.default.fileExists(atPath: stateURL.path)
+        }
+        if moves.contains(where: { failingMoveNames.contains($0.name) }) {
+            throw DeskMagnetError.shellFailed(command: "move", stderr: "missing item")
         }
         moveBatches.append(moves)
     }

@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 Foundation、SwiftUI Observation、AppLocalization 和 DeskMagnetCore.AppCoordinator。
- * [OUTPUT]: 提供 DeskMagnetViewModel，暴露窗口状态、按钮动作、关闭恢复动作、拖动同步动作和焦点恢复回调。
+ * [OUTPUT]: 提供 DeskMagnetViewModel，暴露窗口状态、状态损坏可见性、按钮动作、关闭恢复动作、拖动同步动作和焦点恢复回调。
  * [POS]: DeskMagnetApp 的状态模型，隔离 UI 文案与核心 Finder 编排。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -34,11 +34,17 @@ final class DeskMagnetViewModel: ObservableObject {
 
     var isAttached: Bool {
         if case .attached = phase { return true }
-        return (try? coordinator.unfinishedState()) != nil
+        if case .attached = coordinator.unfinishedStateStatus() { return true }
+        return false
     }
 
     var hasUnfinishedState: Bool {
-        (try? coordinator.unfinishedState()) != nil
+        switch coordinator.unfinishedStateStatus() {
+        case .none:
+            false
+        case .attached, .unreadable:
+            true
+        }
     }
 
     var primaryButtonTitle: String {

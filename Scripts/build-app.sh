@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 #
 # [INPUT]: 依赖 SwiftPM release 构建产物与 Assets/AppIcon/DeskMagnet.icns。
-# [OUTPUT]: 生成 ad-hoc signed build/DeskMagnet.app，并验证 bundle 签名。
+# [OUTPUT]: 生成 ad-hoc signed build/桌面清理大师.app，并验证 bundle 签名。
 # [POS]: Scripts 的 macOS App 打包入口，供本地与 GitHub Actions runner 复用。
 # [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-APP_DIR="$ROOT/build/DeskMagnet.app"
+APP_DIR="$ROOT/build/桌面清理大师.app"
+LEGACY_APP_DIR="$ROOT/build/DeskMagnet.app"
 CONTENTS="$APP_DIR/Contents"
 MACOS="$CONTENTS/MacOS"
 RESOURCES="$CONTENTS/Resources"
@@ -16,7 +17,7 @@ RESOURCES="$CONTENTS/Resources"
 cd "$ROOT"
 swift build -c release --product DeskMagnetApp
 
-rm -rf "$APP_DIR"
+rm -rf "$APP_DIR" "$LEGACY_APP_DIR"
 mkdir -p "$MACOS" "$RESOURCES"
 cp ".build/release/DeskMagnetApp" "$MACOS/DeskMagnet"
 cp "Assets/AppIcon/DeskMagnet.icns" "$RESOURCES/DeskMagnet.icns"

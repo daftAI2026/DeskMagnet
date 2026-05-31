@@ -40,17 +40,17 @@ jobs:
         run: Scripts/build-app.sh
 
       - name: Verify app signature
-        run: codesign --verify --deep --strict --verbose=2 build/DeskMagnet.app
+        run: codesign --verify --deep --strict --verbose=2 "build/桌面清理大师.app"
 
       - name: Archive app bundle
         run: |
           rm -rf dist
           mkdir -p dist
-          ditto -c -k --keepParent build/DeskMagnet.app dist/DeskMagnet.app.zip
+          ditto -c -k --keepParent "build/桌面清理大师.app" "dist/桌面清理大师.app.zip"
 
       - name: Upload app artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DeskMagnet-macOS
-          path: dist/DeskMagnet.app.zip
+          name: 桌面清理大师-macOS
+          path: dist/桌面清理大师.app.zip
           if-no-files-found: error

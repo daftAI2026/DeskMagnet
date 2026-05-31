@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 Foundation 的 URL/Date，承载 Finder 桌面项目与移动命令的纯数据。
- * [OUTPUT]: 对外提供 Point、DesktopItem、IconMove、P0Snapshot、DeskMagnetError。
+ * [OUTPUT]: 对外提供 Point、DesktopItem、IconMove、RecoveryStateStatus、P0Snapshot、DeskMagnetError。
  * [POS]: DeskMagnetCore 的领域模型层，被 FinderIconController、P0Workflow 和 CLI 共同消费。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -87,10 +87,12 @@ public struct DesktopItem: Codable, Equatable, Sendable {
 
 public struct IconMove: Equatable, Sendable {
     public let name: String
+    public let path: String?
     public let position: Point
 
-    public init(name: String, position: Point) {
+    public init(name: String, path: String? = nil, position: Point) {
         self.name = name
+        self.path = path
         self.position = position
     }
 }
@@ -169,6 +171,12 @@ public struct RestoreResult: Equatable, Sendable {
         self.skippedItems = skippedItems
         self.finderSnapshotPath = finderSnapshotPath
     }
+}
+
+public enum RecoveryStateStatus: Equatable, Sendable {
+    case none
+    case attached(RecoveryState)
+    case unreadable(String)
 }
 
 public enum DragSyncMode: Equatable, Sendable {

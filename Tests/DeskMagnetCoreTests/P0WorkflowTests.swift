@@ -66,6 +66,20 @@ struct P0WorkflowTests {
         #expect(shell.commands.contains(["/usr/bin/open", "-g", "-a", "Finder"]))
         #expect(!shell.commands.contains(["/usr/bin/open", "-a", "Finder"]))
     }
+
+    @Test("Process shell runner drains large stdout while the process is running")
+    func processShellRunnerDrainsLargeStdout() async throws {
+        let runner = ProcessShellRunner()
+
+        let result = try await runner.run("/usr/bin/python3", [
+            "-c",
+            "import sys; sys.stdout.write('x' * 1048576)"
+        ])
+
+        #expect(result.exitCode == 0)
+        #expect(result.stdout.count == 1_048_576)
+        #expect(result.stderr == "")
+    }
 }
 
 private final class RecordingShellRunner: ShellRunning, @unchecked Sendable {

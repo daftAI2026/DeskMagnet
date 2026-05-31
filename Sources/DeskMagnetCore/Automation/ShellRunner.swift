@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 Foundation.Process 执行 defaults、osascript、open、pgrep 等系统命令。
- * [OUTPUT]: 对外提供 ShellRunning 协议、ShellResult 和 ProcessShellRunner。
+ * [OUTPUT]: 对外提供 ShellRunning 协议、ShellResult 和边运行边排空 stdout/stderr 的 ProcessShellRunner。
  * [POS]: DeskMagnetCore 的系统边界层，隔离真实进程调用以便 P0Workflow 可测试。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -35,11 +35,19 @@ public final class ProcessShellRunner: ShellRunning, @unchecked Sendable {
             process.arguments = arguments
             process.standardOutput = output
             process.standardError = error
+            let stdoutReader = Task {
+                output.fileHandleForReading.readDataToEndOfFile()
+            }
+            let stderrReader = Task {
+                error.fileHandleForReading.readDataToEndOfFile()
+            }
             try process.run()
             process.waitUntilExit()
+            let stdoutData = await stdoutReader.value
+            let stderrData = await stderrReader.value
             return ShellResult(
-                stdout: String(data: output.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? "",
-                stderr: String(data: error.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? "",
+                stdout: String(data: stdoutData, encoding: .utf8) ?? "",
+                stderr: String(data: stderrData, encoding: .utf8) ?? "",
                 exitCode: process.terminationStatus
             )
         }.value

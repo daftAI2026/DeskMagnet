@@ -58,12 +58,12 @@ public struct LayoutEngine: Sendable {
 
     public func moves(for state: RecoveryState, windowFrame: WindowFrame) -> [IconMove] {
         state.items.enumerated().map { index, item in
-            IconMove(name: item.name, position: point(for: index, frame: windowFrame))
+            IconMove(name: item.name, path: item.path, position: point(for: index, frame: windowFrame))
         }
     }
 
     public func restoreMoves(for state: RecoveryState) -> [IconMove] {
-        state.items.map { IconMove(name: $0.name, position: $0.originalPosition) }
+        state.items.map { IconMove(name: $0.name, path: $0.path, position: $0.originalPosition) }
     }
 
     private func point(for index: Int, frame: WindowFrame) -> Point {

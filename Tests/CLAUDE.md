@@ -2,6 +2,7 @@
 > L2 | 父级: /Users/luo/Desktop/ClaudeCode/web/DeskMagnet/CLAUDE.md
 
 成员清单
+DeskMagnetAppTests/: Swift Testing App 层测试，覆盖本地化文案等不触碰 AppKit/Finder 的纯 UI 状态
 DeskMagnetCoreTests/: Swift Testing 单元测试，覆盖脚本生成、坐标校验与 P0 恢复链路
 
 测试法则:

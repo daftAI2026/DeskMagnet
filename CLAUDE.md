@@ -8,7 +8,7 @@ Swift Package + Swift CLI + Finder AppleScript automation
 Assets/ - 应用视觉资产 (1子目录: AppIcon)
 </directory>
 <directory>
-docs/ - 产品规格、参考素材与展示截图 (2子目录: reference, screenshots)
+docs/ - 产品规格、参考素材、发布说明与展示截图 (3子目录: reference, releases, screenshots)
 </directory>
 <directory>
 Scripts/ - 构建脚本 (1文件: build-app.sh)
@@ -57,5 +57,6 @@ P0 先做命令行验证器，不做 UI；Finder 真实副作用被 ShellRunning
 2026-05-31: 增加 MIT License，并在中英文 README 中补充协议入口。
 2026-05-31: 加固 Finder 图标身份与恢复链路，读取改为 JSON line，移动改用 POSIX path，恢复支持逐项跳过，损坏 state 显式上报，并修复 Process 大输出阻塞风险。
 2026-05-31: 将打包产物文件名统一为“桌面清理大师.app”，同步 CI artifact/README，并收紧完成态中英日韩文案。
+2026-05-31: 增加 v0.1.0 release notes，并让 v* tag 自动发布 GitHub Release 附带桌面清理大师.app.zip。
 
 法则: 极简·稳定·导航·版本精确

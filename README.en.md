@@ -67,7 +67,7 @@ GitHub Actions uses `.github/workflows/build.yml`. Regular pushes and pull reque
 Only two paths create an `.app.zip` artifact:
 
 - Run the workflow manually with `workflow_dispatch`.
-- Push a `v*` tag, for example `v0.1.0`.
+- Push a `v*` tag, for example `v1.0.0`.
 
 The packaging job uploads a `桌面清理大师-macOS` artifact containing `桌面清理大师.app.zip`. CI and local builds share `Scripts/build-app.sh`, so a local packaging pass should match the Runner behavior.
 

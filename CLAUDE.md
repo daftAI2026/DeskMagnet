@@ -26,6 +26,8 @@ LICENSE - MIT 开源协议，定义使用、复制、修改、分发与免责声
 Package.swift - SwiftPM 包定义，暴露 DeskMagnetCore library 与 deskmagnet executable
 README.md - 中文入口文档，说明产品边界、菜单语言、本地构建、Runner 打包、限制与创意来源
 README.en.md - 英文入口文档，与 README.md 互链并说明产品边界、菜单语言、本地构建、Runner 打包、限制与创意来源
+VERSION - App 版本号单一真相源，被打包脚本写入 Info.plist
+CHANGELOG.md - 版本变更记录，汇总公开 release 的新增能力、安全边界与限制
 </config>
 
 架构决策:
@@ -57,6 +59,7 @@ P0 先做命令行验证器，不做 UI；Finder 真实副作用被 ShellRunning
 2026-05-31: 增加 MIT License，并在中英文 README 中补充协议入口。
 2026-05-31: 加固 Finder 图标身份与恢复链路，读取改为 JSON line，移动改用 POSIX path，恢复支持逐项跳过，损坏 state 显式上报，并修复 Process 大输出阻塞风险。
 2026-05-31: 将打包产物文件名统一为“桌面清理大师.app”，同步 CI artifact/README，并收紧完成态中英日韩文案。
-2026-05-31: 增加 v0.1.0 release notes，并让 v* tag 自动发布 GitHub Release 附带桌面清理大师.app.zip。
+2026-05-31: 增加 v1.0.0 release notes，并让 v* tag 自动发布 GitHub Release 附带桌面清理大师.app.zip。
+2026-05-31: 增加 VERSION 单一真相源、prepare-release 脚本和 CHANGELOG.md，将首个公开版本调整为 v1.0.0。
 
 法则: 极简·稳定·导航·版本精确

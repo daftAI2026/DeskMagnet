@@ -21,7 +21,7 @@ Tests/ - Swift Testing 测试代码 (1子目录: DeskMagnetCoreTests)
 </directory>
 
 <config>
-`.gitignore` - 忽略 SwiftPM 构建产物、macOS 元数据与 Xcode 用户状态
+`.gitignore` - 忽略 SwiftPM 构建产物、release dist 产物、macOS 元数据与 Xcode 用户状态
 LICENSE - MIT 开源协议，定义使用、复制、修改、分发与免责声明
 Package.swift - SwiftPM 包定义，暴露 DeskMagnetCore library 与 deskmagnet executable
 README.md - 中文入口文档，说明产品边界、菜单语言、本地构建、Runner 打包、限制与创意来源

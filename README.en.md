@@ -4,13 +4,13 @@ English | [简体中文](README.md)
 
 DeskMagnet is a macOS Finder desktop icon magnet. The app name is localized for users. When you clean the desktop, it does not delete, rename, or move files on disk. It only changes Finder desktop icon coordinates temporarily, places the icons behind the app window, and restores the icons plus Finder desktop settings when you quit or restore.
 
-![Desktop Cleanup Master main window](docs/screenshots/desk-cleaner-home.jpg)
+![Desktop Cleaner main window](docs/screenshots/desk-cleaner-home.jpg)
 
 This project currently supports macOS only. The core behavior depends on Finder AppleScript, the macOS desktop coordinate system, and an `.app` bundle. Windows and Linux are not supported.
 
 ## Features
 
-- Reads Finder desktop items and their original coordinates.
+- Reads Finder desktop icons and their original coordinates.
 - Temporarily disables Finder desktop auto-arrangement so icons can be moved.
 - Calculates a hidden projection area from the window position and tucks icons behind the window.
 - Syncs icons while the window moves, with adaptive throttling for larger desktops.
@@ -25,7 +25,7 @@ On first real cleanup, macOS asks whether DeskMagnet may control Finder. If perm
 
 ## Menus and Language
 
-The app follows the system language by default. You can also switch languages from the macOS menu bar: Simplified Chinese, Traditional Chinese, English, Japanese, and Korean.
+The app follows the system language by default. You can also switch languages from the macOS menu bar: English, Simplified Chinese, Japanese, Traditional Chinese, Spanish, French, Portuguese, Korean, German, and Hindi.
 
 The cleanup action is exposed as its own top-level menu. The main app menu keeps Restore Desktop and Quit. If Finder steals focus during cleanup, the app brings its main window back when the operation finishes.
 
@@ -86,7 +86,7 @@ Scripts/                 Shared local and CI build scripts
 Sources/DeskMagnetApp/   macOS app shell, window, menu, localization, SwiftUI UI
 Sources/DeskMagnetCore/  Finder automation, coordinate conversion, layout, recovery state
 Sources/DeskMagnetCLI/   Command-line verification entry point
-Tests/                   DeskMagnetCore tests
+Tests/                   DeskMagnetCore and DeskMagnetApp tests
 docs/                    Product spec and reference materials
 ```
 

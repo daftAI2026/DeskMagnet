@@ -1,7 +1,7 @@
 /**
  * [INPUT]: 依赖 Foundation 的 URL/Date，承载 Finder 桌面项目与移动命令的纯数据。
- * [OUTPUT]: 对外提供 Point、DesktopItem、IconMove、RecoveryStateStatus、P0Snapshot、DeskMagnetError。
- * [POS]: DeskMagnetCore 的领域模型层，被 FinderIconController、P0Workflow 和 CLI 共同消费。
+ * [OUTPUT]: 对外提供 Point、DesktopItem、IconMove、RecoveryStateStatus、RecoveryState、IconPerformancePolicy、IconPerformanceNotice、DeskMagnetError。
+ * [POS]: DeskMagnetCore 的领域模型层，被 FinderIconController、P0Workflow、AppCoordinator 和 App 本地化层共同消费。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
@@ -185,15 +185,20 @@ public enum DragSyncMode: Equatable, Sendable {
     case finalOnly
 }
 
+public enum IconPerformanceNotice: Equatable, Sendable {
+    case manyIcons
+    case tooManyIcons
+}
+
 public struct IconPerformanceStrategy: Equatable, Sendable {
     public let mode: DragSyncMode
     public let throttleMilliseconds: Int
-    public let warning: String?
+    public let notice: IconPerformanceNotice?
 
-    public init(mode: DragSyncMode, throttleMilliseconds: Int, warning: String? = nil) {
+    public init(mode: DragSyncMode, throttleMilliseconds: Int, notice: IconPerformanceNotice? = nil) {
         self.mode = mode
         self.throttleMilliseconds = throttleMilliseconds
-        self.warning = warning
+        self.notice = notice
     }
 }
 
@@ -208,13 +213,13 @@ public enum IconPerformancePolicy {
             IconPerformanceStrategy(
                 mode: .sampledDuringDrag(sampleLimit: 60),
                 throttleMilliseconds: 250,
-                warning: "桌面图标较多，拖动时将抽样跟随，松手后全量同步。"
+                notice: .manyIcons
             )
         default:
             IconPerformanceStrategy(
                 mode: .finalOnly,
                 throttleMilliseconds: 350,
-                warning: "桌面图标超过 300 个，拖动中暂停实时跟随，松手后全量同步。"
+                notice: .tooManyIcons
             )
         }
     }

@@ -1,7 +1,7 @@
 /**
  * [INPUT]: 依赖 Testing 与 DeskMagnetCore 的 IconPerformancePolicy。
  * [OUTPUT]: 提供图标数量分级策略测试。
- * [POS]: DeskMagnetCoreTests 的 P2 性能策略测试，约束拖动跟随频率与大量图标提示。
+ * [POS]: DeskMagnetCoreTests 的 P2 性能策略测试，约束拖动跟随频率与大量图标提示类型。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
@@ -16,7 +16,7 @@ struct PerformancePolicyTests {
 
         #expect(strategy.mode == .allDuringDrag)
         #expect(strategy.throttleMilliseconds == 100)
-        #expect(strategy.warning == nil)
+        #expect(strategy.notice == nil)
     }
 
     @Test("Uses slower realtime sync for medium desktops")
@@ -33,8 +33,8 @@ struct PerformancePolicyTests {
         let huge = IconPerformancePolicy.strategy(for: 301)
 
         #expect(large.mode == .sampledDuringDrag(sampleLimit: 60))
-        #expect(large.warning != nil)
+        #expect(large.notice == .manyIcons)
         #expect(huge.mode == .finalOnly)
-        #expect(huge.warning != nil)
+        #expect(huge.notice == .tooManyIcons)
     }
 }

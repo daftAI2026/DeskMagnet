@@ -128,7 +128,8 @@ final class DeskMagnetViewModel: ObservableObject {
         do {
             let state = try await coordinator.attach(windowFrame: frame)
             attachedIconCount = state.items.count
-            detailNote = IconPerformancePolicy.strategy(for: state.items.count).warning
+            let strategy = IconPerformancePolicy.strategy(for: state.items.count)
+            detailNote = languageStore.strings.performanceWarning(for: strategy.notice)
             phase = .attached(state.items.count)
         } catch {
             detailNote = nil

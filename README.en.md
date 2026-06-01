@@ -96,4 +96,4 @@ docs/                    Product spec and reference materials
 
 ## License
 
-[MIT License](LICENSE).
+[MIT License](LICENSE)

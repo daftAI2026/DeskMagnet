@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 Testing 与 DeskMagnetApp 的 AppStrings/AppLanguage。
- * [OUTPUT]: 提供语言菜单顺序、CJK 主标题断行、完成态标题、权限提示与新增欧洲/印度语言文案回归测试。
+ * [OUTPUT]: 提供语言菜单顺序、CJK 主标题断行、恢复态一句式文案、完成态标题、权限提示与新增欧洲/印度语言文案回归测试。
  * [POS]: DeskMagnetAppTests 的本地化测试，防止成功态和产品名再次出现机器化硬翻译。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -65,6 +65,27 @@ struct AppLocalizationTests {
             "한 번의 클릭으로 깨끗한",
             "데스크톱을 돌려드립니다"
         ])
+    }
+
+    @Test("Restoring state uses one localized sentence")
+    func restoringStateUsesSingleSentence() {
+        let expectedTitles: [AppLanguage: String] = [
+            .english: "Putting your desktop back the way it was",
+            .simplifiedChinese: "正在将桌面恢复原样",
+            .japanese: "デスクトップを元の状態に戻しています",
+            .traditionalChinese: "正在將桌面恢復原樣",
+            .spanish: "Devolviendo el escritorio a su estado anterior",
+            .french: "Remise du bureau dans son état précédent",
+            .portuguese: "Restaurando o Desktop ao estado anterior",
+            .korean: "데스크톱을 원래대로 되돌리는 중",
+            .german: "Desktop wird in den vorherigen Zustand versetzt",
+            .hindi: "डेस्कटॉप पहले जैसा किया जा रहा है"
+        ]
+
+        for language in AppLanguage.allCases {
+            let strings = AppStrings.values(for: language)
+            #expect(strings.restoringTitle == expectedTitles[language])
+        }
     }
 
     @Test("New localized app names avoid literal Master branding")
@@ -143,7 +164,7 @@ struct AppLocalizationTests {
             return [
                 strings.attachedTitle(iconCount: 1),
                 strings.attachedTitle(iconCount: 29),
-                strings.restoringSubtitle,
+                strings.restoringTitle,
                 strings.manyIconsWarning,
                 strings.tooManyIconsWarning
             ]

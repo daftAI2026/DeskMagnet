@@ -13,6 +13,7 @@
 - 英文展示名从 `Desktop Cleanup Master` 调整为 `Desktop Cleaner`。
 - Core 性能策略只暴露提示类型，用户可见的大量图标提示统一由 App 本地化层渲染。
 - 发布下载包统一为 `Desktop-Cleaner.zip`，避免 GitHub Release 对中文 asset 文件名的归一化导致显示成 `app.zip`。
+- 恢复中界面收敛为一句式本地化状态文案，并用上方恢复图标逆时针旋转替代底部系统 spinner。
 
 ## 1.0.0 - 2026-05-31
 

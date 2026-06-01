@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 SwiftUI、DeskMagnetViewModel 的 Phase 状态和 AppLocalization 文案。
- * [OUTPUT]: 提供亮色 DeskMagnet 主窗口内容视图。
+ * [OUTPUT]: 提供亮色 DeskMagnet 主窗口内容视图，恢复态以逆时针旋转图标承载等待反馈。
  * [POS]: DeskMagnetApp 的 UI 表层，以层级和节奏统一状态与动作入口，不直接操作 Finder。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -143,10 +143,8 @@ private struct StatusSection: View {
 
     var body: some View {
         VStack(spacing: DeskMagnetRhythm.sm) {
-            Image(systemName: presentation.symbolName)
-                .font(.system(size: 40, weight: .light))
-                .foregroundStyle(presentation.color)
-                .frame(width: 56, height: 56)
+            StatusSymbol(presentation: presentation)
+                .id(presentation.symbolName)
             Text(presentation.title)
                 .font(.system(size: 32, weight: .light))
                 .foregroundStyle(presentation.color)
@@ -193,7 +191,7 @@ private struct StatusSection: View {
         case .restoring:
             PhasePresentation(
                 title: strings.restoringTitle,
-                subtitle: strings.restoringSubtitle,
+                subtitle: "",
                 symbolName: "arrow.counterclockwise.circle",
                 color: DeskMagnetPalette.primary
             )
@@ -213,6 +211,30 @@ private struct PhasePresentation {
     let subtitle: String
     let symbolName: String
     let color: Color
+
+    var rotatesCounterclockwise: Bool {
+        symbolName == "arrow.counterclockwise.circle"
+    }
+}
+
+private struct StatusSymbol: View {
+    let presentation: PhasePresentation
+    @State private var rotation = 0.0
+
+    var body: some View {
+        Image(systemName: presentation.symbolName)
+            .font(.system(size: 40, weight: .light))
+            .foregroundStyle(presentation.color)
+            .rotationEffect(.degrees(presentation.rotatesCounterclockwise ? rotation : 0))
+            .frame(width: 56, height: 56)
+            .onAppear {
+                guard presentation.rotatesCounterclockwise else { return }
+                rotation = 0
+                withAnimation(.linear(duration: 1.45).repeatForever(autoreverses: false)) {
+                    rotation = -360
+                }
+            }
+    }
 }
 
 private struct BodyActionGroup: View {
@@ -244,8 +266,10 @@ private struct BodyActionGroup: View {
         switch phase {
         case .attached:
             !footnote.isEmpty
-        case .working, .restoring:
+        case .working:
             true
+        case .restoring:
+            false
         default:
             showsPrimaryButton || !footnote.isEmpty
         }
@@ -290,7 +314,7 @@ private struct ActionSection: View {
 
     private var showsProgress: Bool {
         switch phase {
-        case .working, .restoring:
+        case .working:
             true
         default:
             false
@@ -307,10 +331,6 @@ private struct ProgressSection: View {
                 ProgressView(value: progress)
                     .tint(DeskMagnetPalette.primary)
                     .frame(width: 210)
-            } else if case .restoring = phase {
-                ProgressView()
-                    .controlSize(.small)
-                    .tint(DeskMagnetPalette.primary)
             }
         }
         .frame(height: 28)

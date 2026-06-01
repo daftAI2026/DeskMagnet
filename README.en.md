@@ -96,4 +96,4 @@ docs/                    Product spec and reference materials
 
 ## License
 
-DeskMagnet is released under the [MIT License](LICENSE).
+[MIT License](LICENSE).

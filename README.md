@@ -96,4 +96,4 @@ docs/                    产品规格与参考资料
 
 ## License
 
-DeskMagnet 使用 [MIT License](LICENSE)。
+[MIT License](LICENSE)。

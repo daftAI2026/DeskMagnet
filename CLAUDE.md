@@ -62,5 +62,6 @@ P0 先做命令行验证器，不做 UI；Finder 真实副作用被 ShellRunning
 2026-05-31: 增加 v1.0.0 release notes，并让 v* tag 自动发布 GitHub Release 附带桌面清理大师.app.zip。
 2026-05-31: 增加 VERSION 单一真相源、prepare-release 脚本和 CHANGELOG.md，将首个公开版本调整为 v1.0.0。
 2026-06-01: 将 App/菜单/权限提示扩展到 English、简体中文、日本語、繁體中文、西法葡韩德印地语十种本地化，英文产品名改为 Desktop Cleaner。
+2026-06-01: 将 GitHub Release 外层下载包统一为 Desktop-Cleaner.zip，避免中文 asset 文件名被 GitHub 归一化成 app.zip。
 
 法则: 极简·稳定·导航·版本精确

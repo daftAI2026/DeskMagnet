@@ -31,7 +31,7 @@ if [[ ! -f "$NOTES" ]]; then
 
 ## 下载和运行
 
-下载 \`桌面清理大师.app.zip\`，解压后打开 \`桌面清理大师.app\`。
+下载 release 附件 \`Desktop-Cleaner.zip\`，解压后打开 \`桌面清理大师.app\`。
 
 ## 权限说明
 

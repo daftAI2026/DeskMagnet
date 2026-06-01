@@ -1,3 +1,8 @@
+# [INPUT]: 依赖 SwiftPM、Scripts/build-app.sh、docs/releases/vX.Y.Z.md 与 GitHub CLI release 能力。
+# [OUTPUT]: push/PR 验证 build+test，workflow_dispatch/tag 生成 Desktop-Cleaner.zip，tag 自动发布 GitHub Release。
+# [POS]: GitHub Actions 的唯一主工作流，把测试、打包、发布串成可复现流水线。
+# [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+
 name: Build DeskMagnet
 
 on:
@@ -49,13 +54,13 @@ jobs:
         run: |
           rm -rf dist
           mkdir -p dist
-          ditto -c -k --keepParent "build/桌面清理大师.app" "dist/桌面清理大师.app.zip"
+          ditto -c -k --keepParent "build/桌面清理大师.app" "dist/Desktop-Cleaner.zip"
 
       - name: Upload app artifact
         uses: actions/upload-artifact@v4
         with:
-          name: 桌面清理大师-macOS
-          path: dist/桌面清理大师.app.zip
+          name: Desktop-Cleaner-macOS
+          path: dist/Desktop-Cleaner.zip
           if-no-files-found: error
 
       - name: Publish GitHub release
@@ -63,6 +68,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "dist/桌面清理大师.app.zip#桌面清理大师.app.zip" \
+          gh release create "$GITHUB_REF_NAME" "dist/Desktop-Cleaner.zip" \
             --title "桌面清理大师 ${GITHUB_REF_NAME}" \
             --notes-file "docs/releases/${GITHUB_REF_NAME}.md"
